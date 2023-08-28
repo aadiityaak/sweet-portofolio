@@ -39,6 +39,7 @@ define( 'SWEETPORTOFOLIO_URL', plugin_dir_url( __FILE__ ) );
 
 $files = array(
   	'inc/shortcode.php',
+    'inc/enqueue.php',
     'inc/sweet-options.php',
 );
 foreach ( $files as $file ) {

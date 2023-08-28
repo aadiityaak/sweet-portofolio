@@ -99,15 +99,22 @@ function portofolio_custom_masonry_shortcode() {
             </div>
 
             <!-- Modal -->
-            <div class="modal fade" id="portofolio-modal-<?php echo esc_attr($item['id']); ?>" tabindex="-1" aria-labelledby="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal fade lazy-load-modal" id="portofolio-modal-<?php echo esc_attr($item['id']); ?>" tabindex="-1" aria-labelledby="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>"><?php echo esc_html($item['title']); ?></h5>
+                            <h5 class="modal-title" id="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>">Preview <?php echo esc_html($item['title']); ?></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            <!-- <iframe src="<?php echo esc_url($item['url_live_preview']); ?>" width="100%" height="600" frameborder="0"></iframe> -->
+                        <div class="modal-body p-0">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden pt-5">Loading...</span>
+                                </div>
+                            </div>
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe class="lazy-iframe embed-responsive-item" data-src="<?php echo esc_url($item['url_live_preview']); ?>" width="100%" height="600" frameborder="0"></iframe>
+                            </div>
                         </div>
                     </div>
                 </div>
