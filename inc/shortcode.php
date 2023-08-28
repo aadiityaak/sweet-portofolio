@@ -28,7 +28,7 @@
         ob_start();
         $buttons_markup = '';
         echo '
-        <div class="dropdown">
+        <div class="dropdown text-md-end">
             <button class="btn btn-primary dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             Jenis Web
             </button>
@@ -83,6 +83,10 @@ function portofolio_custom_masonry_shortcode() {
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#portofolio-modal-<?php echo esc_attr($item['id']); ?>">Preview</button>
                             <?php
                                 $whatsapp_number = get_option('portofolio_whatsapp_number'); // Prefix added to option name
+                                // Mengganti "08" dengan "628" dan menghapus karakter selain angka
+                                $whatsapp_number = preg_replace('/[^0-9]/', '', $whatsapp_number);
+                                $whatsapp_number = preg_replace('/^0/', '62', $whatsapp_number);
+
                                 if (!empty($whatsapp_number)) {
                                     $whatsapp_message = "Saya tertarik dengan " . urlencode($item['title']);
                                     $whatsapp_url = "https://wa.me/$whatsapp_number?text=" . urlencode($whatsapp_message);

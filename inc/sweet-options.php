@@ -11,18 +11,18 @@
  **/
 function portofolio_whatsapp_settings_page() {
     add_menu_page(
-        'Portofolio WhatsApp',
-        'Portofolio WhatsApp',
+        'Portofolio Option',
+        'Portofolio Option',
         'manage_options',
-        'portofolio-whatsapp-settings', // Prefix added to page slug
-        'portofolio_whatsapp_settings_page_content',
-        'dashicons-whatsapp',
+        'portofolio-settings', // Prefix added to page slug
+        'portofolio_settings_page_content',
+        'dashicons-admin-settings',
         30
     );
 }
 add_action('admin_menu', 'portofolio_whatsapp_settings_page');
 
-function portofolio_whatsapp_settings_page_content() {
+function portofolio_settings_page_content() {
     ?>
     <div class="wrap">
         <h2>Portofolio WhatsApp Settings</h2>
@@ -35,7 +35,7 @@ function portofolio_whatsapp_settings_page_content() {
                     <td><input type="text" name="portofolio_whatsapp_number" value="<?php echo esc_attr(get_option('portofolio_whatsapp_number')); ?>" /></td>
                 </tr>
                 <tr valign="top">
-                    <th scope="row">WhatsApp Number</th>
+                    <th scope="row">Access Key</th>
                     <td><input type="text" name="portofolio_access_key" value="<?php echo esc_attr(get_option('portofolio_access_key')); ?>" /></td>
                 </tr>
             </table>
