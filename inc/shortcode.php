@@ -76,7 +76,16 @@ function portofolio_custom_masonry_shortcode() {
             ?>
             <div class="col-md-4">
                 <div class="card">
-                    <img src="<?php echo esc_url($item['thumbnail_url']); ?>" class="card-img-top" alt="<?php echo esc_attr($item['title']); ?>">
+                    <div class="position-relative">
+                        <img src="<?php echo esc_url($item['thumbnail_url']); ?>" class="card-img-top" alt="<?php echo esc_attr($item['title']); ?>">
+                        <?php
+                        $portofolio_credit = get_option('portofolio_credit');
+                        if($portofolio_credit) {
+                            echo '<span class="portofolio-credit">'.$portofolio_credit.'</span>';
+                        }
+
+                        ?>
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title h6"><?php echo esc_html($item['title']); ?></h5>
                         <div class="btn-group w-100" role="group" aria-label="Basic example">
@@ -103,7 +112,7 @@ function portofolio_custom_masonry_shortcode() {
                 <div class="modal-dialog modal-dialog-centered modal-xxl">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>">Preview <?php echo esc_html($item['title']); ?></h5>
+                            <h5 class="modal-title text-truncate" id="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>">Preview <?php echo esc_html($item['title']); ?></h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-0">

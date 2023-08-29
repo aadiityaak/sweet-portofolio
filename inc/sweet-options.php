@@ -38,6 +38,10 @@ function portofolio_settings_page_content() {
                     <th scope="row">Access Key</th>
                     <td><input type="text" name="portofolio_access_key" value="<?php echo esc_attr(get_option('portofolio_access_key')); ?>" /></td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row">Credit Text</th>
+                    <td><input type="text" name="portofolio_credit" value="<?php echo esc_attr(get_option('portofolio_credit')); ?>" /></td>
+                </tr>
             </table>
             <?php submit_button(); ?>
         </form>
@@ -48,5 +52,6 @@ function portofolio_settings_page_content() {
 function portofolio_register_whatsapp_settings() {
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_whatsapp_number'); // Prefix added to setting name
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_access_key'); // Prefix added to setting name
+    register_setting('portofolio-whatsapp-settings-group', 'portofolio_credit');
 }
 add_action('admin_init', 'portofolio_register_whatsapp_settings');
