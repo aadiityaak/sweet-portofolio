@@ -100,7 +100,7 @@ function portofolio_custom_masonry_shortcode() {
 
             <!-- Modal -->
             <div class="modal fade lazy-load-modal" id="portofolio-modal-<?php echo esc_attr($item['id']); ?>" tabindex="-1" aria-labelledby="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-dialog modal-dialog-centered modal-xxl">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>">Preview <?php echo esc_html($item['title']); ?></h5>
