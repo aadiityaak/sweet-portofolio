@@ -11,4 +11,5 @@ jQuery(document).ready(function ($) {
       iframe.attr("src", src).removeClass("lazy-iframe");
     }
   });
+  $(".dropdown-toggle").dropdown();
 });

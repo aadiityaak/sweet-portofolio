@@ -27,17 +27,44 @@
     if (!empty($data)) {
         ob_start();
         $buttons_markup = '';
-        echo '
-        <div class="dropdown text-md-end">
-            <button class="btn btn-primary dropdown-toggle text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Jenis Web
-            </button>
-            <ul class="dropdown-menu">';
-            foreach ($data as $category) {
-                echo '<li><a class="dropdown-item" href="?jenis_web='.$category['slug'].'" >'.$category['category'].' ('.$category['count'].')</a></li>';
-            }
-            echo '</ul>';
-        echo '</div>';
+        ?>
+        <a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#portofolioModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-diagram-3" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/>
+            </svg>
+            Pilih Kategori
+        </a>
+        <!-- Modal -->
+        <div class="modal fade" id="portofolioModal" tabindex="-1" aria-labelledby="portofolioModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="portofolioModalLabel">Demo Website</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <ul class="list-group">
+                    <?php
+                    foreach ($data as $category) {
+                        ?>
+                            <a href="?jenis_web=<?php echo $category['slug']; ?>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                <div class="fw-bold">
+                                    <b><?php echo $category['category']; ?></b>
+                                </div>
+                                    Demo website <?php echo $category['category']; ?>
+                                </div>
+                                <span class="badge bg-danger rounded-pill">
+                                    <?php echo $category['count']; ?>
+                                </span>
+                            </a>
+                        <?php
+                    }
+                    echo '</ul>';
+                echo '</div>
+            </div>
+            </div>
+        </div>';
         return ob_get_clean();
     }
 
