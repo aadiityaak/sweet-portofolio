@@ -76,12 +76,17 @@ add_shortcode('sweet-portofolio-jenis-web', 'sweet_portofolio_jenis_web_shortcod
 function portofolio_custom_masonry_shortcode() {
     ob_start();
     $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : '';
+    $image_size = get_option('portofolio_image_size'); // Ganti dengan kunci akses yang Anda gunakan
     $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
 
     $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/portofolio?access_key='.$access_key;
 
     if (!empty($jenis_web)) {
         $api_url .= '&jenis_web=' . $jenis_web;
+    }
+
+    if (!empty($image_size)) {
+        $api_url .= '&image_size=' . $image_size;
     }
 
     $response = wp_remote_get($api_url);
