@@ -45,3 +45,22 @@ $files = array(
 foreach ( $files as $file ) {
 	require_once plugin_dir_path( __FILE__ ) . $file;
 }
+
+//Load template from specific page
+add_filter( 'page_template', 'wpa3396_page_template' );
+function wpa3396_page_template( $page_template ){
+
+    if ( get_page_template_slug() == 'page-preview.php' ) {
+        $page_template = dirname( __FILE__ ) . '/inc/page-preview.php';
+    }
+    return $page_template;
+}
+
+add_filter( 'theme_page_templates', 'wpse_288589_add_template_to_select', 10, 4 );
+function wpse_288589_add_template_to_select( $post_templates, $wp_theme, $post, $post_type ) {
+
+    // Add custom template named template-custom.php to select dropdown 
+    $post_templates['page-preview.php'] = __('Preview Portofolio');
+
+    return $post_templates;
+}

@@ -11,18 +11,29 @@
  **/
 
  function sweet_portofolio_jenis_web_shortcode() {
-    
-    $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
-    $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
-
-    $response = wp_remote_get($api_url);
-
-    if (is_wp_error($response)) {
-        return 'Error fetching data.';
+    if (!session_id()) {
+        session_start();
     }
+    $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
+    
+    // Cek apakah data sudah ada dalam sesi
+    if (isset($_SESSION['jenis_web_data'])) {
+        $data = $_SESSION['jenis_web_data'];
+    } else {
+        $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
 
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
+        $response = wp_remote_get($api_url);
+
+        if (is_wp_error($response)) {
+            return 'Error fetching data.';
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+
+        // Simpan data dalam sesi
+        $_SESSION['jenis_web_data'] = $data;
+    }
 
     if (!empty($data)) {
         ob_start();
@@ -75,31 +86,39 @@ add_shortcode('sweet-portofolio-jenis-web', 'sweet_portofolio_jenis_web_shortcod
 
 function portofolio_custom_masonry_shortcode() {
     ob_start();
+    if (!session_id()) {
+        session_start();
+    }
     $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : '';
     $image_size = get_option('portofolio_image_size'); // Ganti dengan kunci akses yang Anda gunakan
     $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
+    $preview_page = get_option('portofolio_preview_page'); // Ganti dengan kunci akses yang Anda gunakan
 
-    $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/portofolio?access_key='.$access_key;
-
-    if (!empty($jenis_web)) {
-        $api_url .= '&jenis_web=' . $jenis_web;
-    }
-
-    if (!empty($image_size)) {
-        $api_url .= '&image_size=' . $image_size;
-    }
-
-    $response = wp_remote_get($api_url);
-
-    if (is_wp_error($response)) {
-        return 'Error fetching data from API.';
-    }
-
-    $body = wp_remote_retrieve_body($response);
-    $data = json_decode($body, true);
-
-    if (empty($data)) {
-        return 'No data available.';
+    // Cek apakah data sudah ada dalam sesi
+    if (isset($_SESSION['web_data'])) {
+        $data = $_SESSION['web_data'];
+    } else {
+        $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/portofolio?access_key='.$access_key;
+    
+        if (!empty($jenis_web)) {
+            $api_url .= '&jenis_web=' . $jenis_web;
+        }
+    
+        if (!empty($image_size)) {
+            $api_url .= '&image_size=' . $image_size;
+        }
+    
+        $response = wp_remote_get($api_url);
+    
+        if (is_wp_error($response)) {
+            return 'Error fetching data from API.';
+        }
+    
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+    
+        // Simpan data dalam sesi
+        $_SESSION['web_data'] = $data;
     }
 
     ?>
@@ -121,7 +140,7 @@ function portofolio_custom_masonry_shortcode() {
                     <div class="card-body">
                         <h5 class="card-title h6"><?php echo esc_html($item['title']); ?></h5>
                         <div class="btn-group w-100" role="group" aria-label="Basic example">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#portofolio-modal-<?php echo esc_attr($item['id']); ?>">Preview</button>
+                            <a class="btn btn-primary" target="_blank" href="<?php echo get_the_permalink($preview_page); ?>?id=<?php echo esc_html($item['id']); ?>">Preview</button>
                             <?php
                                 $whatsapp_number = get_option('portofolio_whatsapp_number'); // Prefix added to option name
                                 // Mengganti "08" dengan "628" dan menghapus karakter selain angka
@@ -134,28 +153,6 @@ function portofolio_custom_masonry_shortcode() {
                                     ?>
                                     <a target="_blank" href="<?php echo esc_url($whatsapp_url); ?>" class="btn btn-success">Order</a>
                             <?php } ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal -->
-            <div class="modal fade lazy-load-modal" id="portofolio-modal-<?php echo esc_attr($item['id']); ?>" tabindex="-1" aria-labelledby="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-xxl">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title text-truncate" id="portofolio-modalLabel-<?php echo esc_attr($item['id']); ?>">Preview <?php echo esc_html($item['title']); ?></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-0">
-                            <div class="text-center">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden pt-5">Loading...</span>
-                                </div>
-                            </div>
-                            <div class="embed-responsive embed-responsive-16by9">
-                                <iframe class="lazy-iframe embed-responsive-item" data-src="<?php echo esc_url($item['url_live_preview']); ?>" width="100%" height="600" frameborder="0"></iframe>
-                            </div>
                         </div>
                     </div>
                 </div>

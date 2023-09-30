@@ -52,6 +52,20 @@ function portofolio_settings_page_content() {
                         </select>
                     </td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row">Preview Page</th>
+                    <td>
+                        <?php
+                        $selected_page = esc_attr(get_option('portofolio_preview_page'));
+                        wp_dropdown_pages(array(
+                            'name' => 'portofolio_preview_page',
+                            'show_option_none' => '-- Select a Page --',
+                            'option_none_value' => '-1',
+                            'selected' => $selected_page,
+                        ));
+                        ?>
+                    </td>
+                </tr>
             </table>
             <?php submit_button(); ?>
         </form>
@@ -64,5 +78,6 @@ function portofolio_register_whatsapp_settings() {
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_access_key'); // Prefix added to setting name
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_credit');
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_image_size'); // Register the new setting for image size
+    register_setting('portofolio-whatsapp-settings-group', 'portofolio_preview_page');
 }
 add_action('admin_init', 'portofolio_register_whatsapp_settings');
