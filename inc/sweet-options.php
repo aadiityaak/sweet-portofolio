@@ -26,6 +26,13 @@ function portofolio_settings_page_content() {
     $access_key = get_option('portofolio_access_key');
     $portfolioSelection = (array) get_option('portofolio_selection', []);
     
+    // Check if the "Clear Session" button is clicked
+    if (isset($_GET['clear_session'])) {
+        // Hapus session dengan nama 'web_data' dan 'jenis_web_data'
+        unset($_SESSION['web_data']);
+        unset($_SESSION['jenis_web_data']);
+    }
+
     // Cek apakah data sudah ada dalam sesi
     if (isset($_SESSION['jenis_web_data'])) {
         $data = $_SESSION['jenis_web_data'];
@@ -67,9 +74,10 @@ function portofolio_settings_page_content() {
                     <th scope="row">Image Size</th>
                     <td>
                         <select name="portofolio_image_size">
-                            <option value="thumbnail" <?php selected(get_option('portofolio_image_size'), 'thumbnail'); ?>>Thumbnail (400 x 400)</option>
-                            <option value="large" <?php selected(get_option('portofolio_image_size'), 'large'); ?>>Large (700 x 700)</option>
-                            <option value="full" <?php selected(get_option('portofolio_image_size'), 'full'); ?>>Full (1000 x 1000)</option>
+                            <option value="thumbnail" <?php selected(get_option('portofolio_image_size'), 'thumbnail'); ?>>Thumbnail 400</option>
+                            <option value="medium" <?php selected(get_option('portofolio_image_size'), 'medium'); ?>>Medium 700</option>
+                            <option value="large" <?php selected(get_option('portofolio_image_size'), 'large'); ?>>Large 1000</option>
+                            <option value="full" <?php selected(get_option('portofolio_image_size'), 'full'); ?>>Full 1080</option>
                         </select>
                     </td>
                 </tr>
@@ -123,6 +131,7 @@ function portofolio_settings_page_content() {
                 </tr>
             </table>
             <?php submit_button(); ?>
+            <a class="button" href="?page=portofolio-settings&clear_session=true">Clear Session</a>
         </form>
     </div>
     <?php
