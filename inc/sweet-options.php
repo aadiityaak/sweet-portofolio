@@ -53,6 +53,15 @@ function portofolio_settings_page_content() {
                     </td>
                 </tr>
                 <tr valign="top">
+                    <th scope="row">Style Thumbnail</th>
+                    <td>
+                        <select name="portofolio_style_thumbnail">
+                            <option value="thumbnail" <?php selected(get_option('portofolio_style_thumbnail'), 'thumbnail'); ?>>Standart</option>
+                            <option value="screenshot" <?php selected(get_option('portofolio_style_thumbnail'), 'screenshot'); ?>>Screenshot</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="top">
                     <th scope="row">Preview Page</th>
                     <td>
                         <?php
@@ -79,5 +88,6 @@ function portofolio_register_whatsapp_settings() {
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_credit');
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_image_size'); // Register the new setting for image size
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_preview_page');
+    register_setting('portofolio-whatsapp-settings-group', 'portofolio_style_thumbnail');
 }
 add_action('admin_init', 'portofolio_register_whatsapp_settings');
