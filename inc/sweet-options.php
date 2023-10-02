@@ -23,6 +23,29 @@ function portofolio_whatsapp_settings_page() {
 add_action('admin_menu', 'portofolio_whatsapp_settings_page');
 
 function portofolio_settings_page_content() {
+    if (!session_id()) {
+        session_start();
+    }
+    $access_key = get_option('portofolio_access_key');
+    
+    // Cek apakah data sudah ada dalam sesi
+    if (isset($_SESSION['jenis_web_data'])) {
+        $data = $_SESSION['jenis_web_data'];
+    } else {
+        $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
+
+        $response = wp_remote_get($api_url);
+
+        if (is_wp_error($response)) {
+            return 'Error fetching data.';
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+
+        // Simpan data dalam sesi
+        $_SESSION['jenis_web_data'] = $data;
+    }
     ?>
     <div class="wrap">
         <h2>Portofolio WhatsApp Settings</h2>
@@ -62,6 +85,20 @@ function portofolio_settings_page_content() {
                     </td>
                 </tr>
                 <tr valign="top">
+                    <th scope="row">Portofolio Page</th>
+                    <td>
+                        <?php
+                        $selected_page = esc_attr(get_option('portofolio_page'));
+                        wp_dropdown_pages(array(
+                            'name' => 'portofolio_page',
+                            'show_option_none' => '-- Select a Page --',
+                            'option_none_value' => '-1',
+                            'selected' => $selected_page,
+                        ));
+                        ?>
+                    </td>
+                </tr>
+                <tr valign="top">
                     <th scope="row">Preview Page</th>
                     <td>
                         <?php
@@ -73,6 +110,17 @@ function portofolio_settings_page_content() {
                             'selected' => $selected_page,
                         ));
                         ?>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Portfolio Selection</th>
+                    <td>
+                        <?php foreach ($data as $portfolio) : ?>
+                            <label>
+                                <input type="checkbox" name="portofolio_selection[]" value="<?php echo esc_attr($portfolio['slug']); ?>" <?php checked(in_array($portfolio['slug'], get_option('portofolio_selection', []))); ?>>
+                                <?php echo esc_html($portfolio['category']); ?>
+                            </label><br>
+                        <?php endforeach; ?>
                     </td>
                 </tr>
             </table>
@@ -87,7 +135,9 @@ function portofolio_register_whatsapp_settings() {
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_access_key'); // Prefix added to setting name
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_credit');
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_image_size'); // Register the new setting for image size
+    register_setting('portofolio-whatsapp-settings-group', 'portofolio_page');
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_preview_page');
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_style_thumbnail');
+    register_setting('portofolio-whatsapp-settings-group', 'portofolio_selection');
 }
 add_action('admin_init', 'portofolio_register_whatsapp_settings');
