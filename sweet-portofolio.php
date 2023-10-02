@@ -64,3 +64,10 @@ function wpse_288589_add_template_to_select( $post_templates, $wp_theme, $post, 
 
     return $post_templates;
 }
+
+function sweet_portofolio_init() {
+    if (!session_id()) {
+        session_start();
+    }
+}
+add_action('init', 'sweet_portofolio_init');

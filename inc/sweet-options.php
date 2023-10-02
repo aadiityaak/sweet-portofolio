@@ -23,10 +23,8 @@ function portofolio_whatsapp_settings_page() {
 add_action('admin_menu', 'portofolio_whatsapp_settings_page');
 
 function portofolio_settings_page_content() {
-    if (!session_id()) {
-        session_start();
-    }
     $access_key = get_option('portofolio_access_key');
+    $portfolioSelection = (array) get_option('portofolio_selection', []);
     
     // Cek apakah data sudah ada dalam sesi
     if (isset($_SESSION['jenis_web_data'])) {
@@ -117,7 +115,7 @@ function portofolio_settings_page_content() {
                     <td>
                         <?php foreach ($data as $portfolio) : ?>
                             <label>
-                                <input type="checkbox" name="portofolio_selection[]" value="<?php echo esc_attr($portfolio['slug']); ?>" <?php checked(in_array($portfolio['slug'], get_option('portofolio_selection', []))); ?>>
+                            <input type="checkbox" name="portofolio_selection[]" value="<?php echo esc_attr($portfolio['slug']); ?>" <?php checked(is_array($portfolioSelection) && in_array($portfolio['slug'], $portfolioSelection)); ?>>
                                 <?php echo esc_html($portfolio['category']); ?>
                             </label><br>
                         <?php endforeach; ?>

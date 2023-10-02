@@ -11,9 +11,7 @@
  **/
 
  function sweet_portofolio_jenis_web_shortcode() {
-    if (!session_id()) {
-        session_start();
-    }
+
     $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
     $portofolio_selection = get_option('portofolio_selection');
     
@@ -87,9 +85,6 @@ add_shortcode('sweet-portofolio-jenis-web', 'sweet_portofolio_jenis_web_shortcod
 
 function portofolio_custom_masonry_shortcode() {
     ob_start();
-    if (!session_id()) {
-        session_start();
-    }
     $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : '';
     $image_size = get_option('portofolio_image_size'); // Ganti dengan kunci akses yang Anda gunakan
     $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
