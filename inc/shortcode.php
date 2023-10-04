@@ -159,7 +159,7 @@ function portofolio_custom_masonry_shortcode() {
             $images = ($style_thumbnail == 'thumbnail') ? $item['thumbnail_url'] : $item['screenshot'];
                 // if(($jenis_web == $item['jenis']) || empty($jenis_web)){
                 ?>
-                <div class="col-md-4">
+                <div class="col-md-4 col-6">
                     <div class="card">
                         <div class="position-relative">
                             <img src="<?php echo esc_url($images); ?>" class="card-img-top" alt="<?php echo esc_attr($item['title']); ?>">
