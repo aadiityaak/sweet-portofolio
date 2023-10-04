@@ -102,6 +102,12 @@ function portofolio_settings_page_content() {
                             'selected' => $selected_page,
                         ));
                         ?>
+                        <br>
+                        <span>
+                            Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih.<br>
+                            [sweet-portofolio-jenis-web] Digunakan untuk menampilkan tombol filter berdasarkan jenis web.<br>
+                            [sweet-portofolio-list] Digunakan untuk menampilkan list thumbnail portofolio.
+                        </span>
                     </td>
                 </tr>
                 <tr valign="top">
@@ -116,6 +122,10 @@ function portofolio_settings_page_content() {
                             'selected' => $selected_page,
                         ));
                         ?>
+                        <br>
+                        <span>
+                            Pastikan sudah merubah page template menjadi 'Preview Portofolio' pada page yang dipilih.
+                        </span>
                     </td>
                 </tr>
                 <tr valign="top">
