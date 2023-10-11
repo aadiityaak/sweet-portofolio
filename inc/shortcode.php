@@ -143,7 +143,7 @@ function portofolio_custom_masonry_shortcode($atts) {
     }
 
     // Menentukan halaman yang sedang aktif (dapat berasal dari parameter URL atau variabel lain)
-    $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $current_page = isset($_GET['halaman']) ? (int)$_GET['halaman'] : 1;
 
     // Menentukan jumlah item per halaman
     $items_per_page = 12;
@@ -209,7 +209,7 @@ function portofolio_custom_masonry_shortcode($atts) {
         for ($i = 1; $i <= $total_pages; $i++) {
             $active_class = ($i == $current_page) ? "active" : "";
             echo "<li class='page-item $active_class'>";
-            echo "<a class='page-link' href='?page=$i'>$i</a>";
+            echo "<a class='page-link' href='?halaman=$i'>$i</a>";
             echo "</li>";
         }
         echo "</ul>";
