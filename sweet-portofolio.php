@@ -5,7 +5,7 @@
  * @package       SWEETPORTOFOLIO
  * @author        Aditya K
  * @license       gplv2
- * @version       1.0.0
+ * @version       1.0.2
  *
  * @wordpress-plugin
  * Plugin Name:   Sweet Portofolio

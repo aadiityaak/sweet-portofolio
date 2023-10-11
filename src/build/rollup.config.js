@@ -37,7 +37,7 @@ module.exports = {
   ],
   output: {
     banner,
-    file: path.resolve(__dirname, `../../public/js/${fileDest}`),
+    file: path.resolve(__dirname, `../../assets/js/${fileDest}`),
     format: "umd",
     globals,
     name: "sweet-portofolio",

@@ -1,18 +1,18 @@
 {
   "name": "sweet-portofolio",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple addon for the Sweetweb theme",
   "author": "websweetstudio.com",
   "homepage": "https://websweetstudio.com",
   "scripts": {
     "copy": "node src/build/copy-assets.js",
     "css": "npm-run-all css-compile css-postcss css-minify",
-    "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css --quiet src/sass/sweet-portofolio.scss:public/css/sweet-portofolio.css",
-    "css-minify": "cleancss -O1 --format breakWith=lf --with-rebase --source-map --source-map-inline-sources --output public/css/ --batch --batch-suffix \".min\" \"public/css/*.css\" \"!public/css/*.min.css\" \"!public/css/*rtl*.css\"",
-    "css-postcss": "postcss --config src/build/postcss.config.js --replace \"public/css/*.css\" \"!public/css/*.rtl*.css\" \"!public/css/*.min.css\"",
+    "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css --quiet src/sass/sweet-portofolio.scss:assets/css/style.css",
+    "css-minify": "cleancss -O1 --format breakWith=lf --with-rebase --source-map --source-map-inline-sources --output assets/css/ --batch --batch-suffix \".min\" \"assets/css/*.css\" \"!assets/css/*.min.css\" \"!assets/css/*rtl*.css\"",
+    "css-postcss": "postcss --config src/build/postcss.config.js --replace \"assets/css/*.css\" \"!assets/css/*.rtl*.css\" \"!assets/css/*.min.css\"",
     "js": "npm-run-all js-compile js-minify",
     "js-compile": "rollup --config src/build/rollup.config.js --sourcemap",
-    "js-minify": "terser  --config-file src/build/terser.config.json --output public/js/sweet-portofolio.min.js public/js/sweet-portofolio.js",
+    "js-minify": "terser  --config-file src/build/terser.config.json --output assets/js/script.min.js assets/js/script.js",
     "dist": "npm-run-all css js",
     "build": "node src/build/dist-build.js",
     "package": "npm-run-all dist build"
