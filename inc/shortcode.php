@@ -83,9 +83,12 @@
 
 add_shortcode('sweet-portofolio-jenis-web', 'sweet_portofolio_jenis_web_shortcode');
 
-function portofolio_custom_masonry_shortcode() {
+function portofolio_custom_masonry_shortcode($atts) {
+	$a = shortcode_atts( array(
+		'default' => '',
+	), $atts );
     ob_start();
-    $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : '';
+    $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : $a['default'];
     $image_size = get_option('portofolio_image_size'); // Ganti dengan kunci akses yang Anda gunakan
     $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
     $preview_page = get_option('portofolio_preview_page'); // Ganti dengan kunci akses yang Anda gunakan
@@ -125,17 +128,18 @@ function portofolio_custom_masonry_shortcode() {
     // }
     // print_r($data);
     // Filter hanya elemen dengan jenis 'landing-page'
-    if(isset($_GET['jenis_web'])){
-        $data = array_filter($data, function($item) {
-            return $item['jenis'] == $_GET['jenis_web'];
+    if (isset($jenis_web) && $jenis_web != '') {
+        $data = array_filter($data, function($item) use ($jenis_web) {
+            if (is_array($item)) {
+                return isset($item['jenis']) && $item['jenis'] == $jenis_web;
+            }
         });
-    } else if($portofolio_selection) {
-        // foreach($portofolio_selection as $list_porto){
-            // echo $list_porto;
-            $data = array_filter($data, function($item) use ($portofolio_selection) {
-                return in_array($item['jenis'], $portofolio_selection);
-            });
-        // }
+    } elseif ($portofolio_selection) {
+        $data = array_filter($data, function($item) use ($portofolio_selection, $jenis_web) {
+            if (is_array($item)) {
+                return isset($item['jenis']) && in_array($item['jenis'], $portofolio_selection);
+            }
+        });
     }
 
     // Menentukan halaman yang sedang aktif (dapat berasal dari parameter URL atau variabel lain)
