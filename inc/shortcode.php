@@ -86,6 +86,8 @@ add_shortcode('sweet-portofolio-jenis-web', 'sweet_portofolio_jenis_web_shortcod
 function portofolio_custom_masonry_shortcode($atts) {
 	$a = shortcode_atts( array(
 		'default' => '',
+        'include' => '',
+        'title' => 'yes',
 	), $atts );
     ob_start();
     $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : $a['default'];
@@ -142,6 +144,16 @@ function portofolio_custom_masonry_shortcode($atts) {
         });
     }
 
+    // Tampilkan hanya id tertentu
+    if (isset($a['include']) && $a['include'] != '') {
+        $includes = $a['include'] ? explode(',', $a['include']) : [];
+        $data = array_filter($data, function($item) use ($includes) {
+            if (is_array($item)) {
+                return isset($item['id']) && in_array($item['id'], $includes);
+            }
+        });
+    }
+
     // Menentukan halaman yang sedang aktif (dapat berasal dari parameter URL atau variabel lain)
     $current_page = isset($_GET['halaman']) ? (int)$_GET['halaman'] : 1;
 
@@ -176,7 +188,9 @@ function portofolio_custom_masonry_shortcode($atts) {
                             ?>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title h6"><?php echo esc_html($item['title']); ?></h5>
+                            <?php if($a['title'] != 'no'){ ?>
+                                <h5 class="card-title h6"><?php echo esc_html($item['title']); ?></h5>
+                            <?php } ?>
                             <div class="btn-group w-100" role="group" aria-label="Basic example">
                                 <a class="btn btn-primary" target="_blank" href="<?php echo get_the_permalink($preview_page); ?>?id=<?php echo esc_html($item['id']); ?>">Preview</button>
                                 <?php

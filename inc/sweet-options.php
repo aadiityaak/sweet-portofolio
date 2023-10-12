@@ -106,7 +106,8 @@ function portofolio_settings_page_content() {
                         <span>
                             Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih.<br>
                             [sweet-portofolio-jenis-web] Digunakan untuk menampilkan tombol filter berdasarkan jenis web.<br>
-                            [sweet-portofolio-list default="profil-perusahaan"] Digunakan untuk menampilkan list thumbnail portofolio.
+                            [sweet-portofolio-list default="profil-perusahaan"] Digunakan untuk menampilkan list thumbnail portofolio.<br>
+                            [sweet-portofolio-list include="1982,1670" title="no"] Digunakan untuk menampilkan portofolio berdasarkan id nya
                         </span>
                     </td>
                 </tr>
