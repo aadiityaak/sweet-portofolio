@@ -10,5 +10,7 @@
 
 	jQuery(function () {});
 
+	jQuery(function () {});
+
 }));
 //# sourceMappingURL=script.js.map

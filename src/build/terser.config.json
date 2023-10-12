@@ -16,7 +16,7 @@
   },
   "mangle": {},
   "sourceMap": {
-    "filename": "js/sweet-portofolio.js.map",
-    "url": "sweet-portofolio.min.js.map"
+    "filename": "js/script.js.map",
+    "url": "script.min.js.map"
   }
 }

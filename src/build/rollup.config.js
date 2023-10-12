@@ -8,7 +8,7 @@ import multi from "@rollup/plugin-multi-entry";
 const replace = require("@rollup/plugin-replace");
 const banner = require("./banner.js");
 
-let fileDest = "sweet-portofolio.js";
+let fileDest = "script.js";
 const external = ["jquery"];
 const plugins = [
   babel({
@@ -31,7 +31,6 @@ const globals = {
 
 module.exports = {
   input: [
-    path.resolve(__dirname, "../js/bootstrap.js"),
     path.resolve(__dirname, "../js/sweet-portofolio.js"),
     path.resolve(__dirname, "../js/custom.js"),
   ],
