@@ -37,8 +37,8 @@ $data_title = $data['title'] ?? '';
     <?php wp_head(); ?>
 </head>
 
-<body <?php body_class(); ?>>
-    <header class="d-flex justify-content-between align-items-center p-2 bg-dark shadow-sm">
+<body <?php body_class('wss-preview-page'); ?>>
+    <header class="header-preview d-flex justify-content-between align-items-center p-2 bg-dark shadow-sm">
         <!-- Back to Home Button -->
         <a class="btn btn-primary btn-sm align-middle text-white" href="<?php echo get_the_permalink($portofolio_page); ?>">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
@@ -75,7 +75,7 @@ $data_title = $data['title'] ?? '';
             if (!empty($demo_url)) :
             ?>
                 <div id="iframe-container">
-                    <iframe src="<?php echo esc_url( $demo_url ); ?>" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
+                    <iframe src="<?php echo esc_url( $demo_url ); ?>" width="100%" frameborder="0" allowfullscreen></iframe>
                 </div>
             <?php else : ?>
                 <p>Demo URL is not set.</p>
