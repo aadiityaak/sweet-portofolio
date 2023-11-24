@@ -217,13 +217,14 @@ function portofolio_custom_masonry_shortcode($atts) {
     <!-- Menampilkan Pagination -->
     <?php
     // Menampilkan link pagination hanya jika lebih dari 1 halaman
+    $jenis_web = isset($_GET['jenis_web']) ? '&jenis_web='.$_GET['jenis_web']: '';
     if ($total_pages > 1) {
         echo "<nav aria-label='Page navigation' class='pt-3'>";
         echo "<ul class='pagination justify-content-center'>";
         for ($i = 1; $i <= $total_pages; $i++) {
             $active_class = ($i == $current_page) ? "active" : "";
             echo "<li class='page-item $active_class'>";
-            echo "<a class='page-link' href='?halaman=$i'>$i</a>";
+            echo "<a class='page-link' href='?halaman={$i}{$jenis_web}'>$i</a>";
             echo "</li>";
         }
         echo "</ul>";
