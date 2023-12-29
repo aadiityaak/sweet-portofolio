@@ -133,9 +133,10 @@ function portofolio_custom_masonry_shortcode($atts) {
     if (isset($jenis_web) && $jenis_web != '') {
         $data = array_filter($data, function($item) use ($jenis_web) {
             if (is_array($item)) {
-                return isset($item['jenis']) && $item['jenis'] == $jenis_web;
+                return isset($item['jenis']) && strpos($item['jenis'], $jenis_web) !== false;
             }
         });
+        
     } elseif ($portofolio_selection) {
         $data = array_filter($data, function($item) use ($portofolio_selection, $jenis_web) {
             if (is_array($item)) {
