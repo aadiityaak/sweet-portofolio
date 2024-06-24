@@ -26,19 +26,12 @@ function portofolio_settings_page_content() {
     $access_key = get_option('portofolio_access_key');
     $portfolioSelection = (array) get_option('portofolio_selection', []);
     
-    // Check if the "Clear Session" button is clicked
-    if (isset($_GET['clear_session'])) {
-        // Hapus session dengan nama 'web_data' dan 'jenis_web_data'
-        unset($_SESSION['web_data']);
-        unset($_SESSION['jenis_web_data']);
-    }
 
     // Cek apakah data sudah ada dalam sesi
-    if (isset($_SESSION['jenis_web_data'])) {
-        $data = $_SESSION['jenis_web_data'];
-    } else {
-        $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
+    $data = get_transient('jenis_web_data');
 
+    if (!$data) {
+        $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
         $response = wp_remote_get($api_url);
 
         if (is_wp_error($response)) {
@@ -48,8 +41,9 @@ function portofolio_settings_page_content() {
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
 
-        // Simpan data dalam sesi
-        $_SESSION['jenis_web_data'] = $data;
+        // Simpan data dalam transient selama 1 jam (3600 detik)
+        $transient_key = 'jenis_web_data';
+        $transient_set = set_transient($transient_key, $data, 12 * 3600);
     }
     ?>
     <div class="wrap">
@@ -142,7 +136,6 @@ function portofolio_settings_page_content() {
                 </tr>
             </table>
             <?php submit_button(); ?>
-            <a class="button" href="?page=portofolio-settings&clear_session=true">Clear Session</a>
         </form>
     </div>
     <?php
