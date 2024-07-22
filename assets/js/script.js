@@ -15,7 +15,7 @@
     });
 
     // Close modal
-    document.querySelector(".btn-close").addEventListener("click", function () {
+    document.querySelector(".close-modal-portofolio").addEventListener("click", function () {
       this.closest(".modal").style.display = "none";
     });
 
@@ -29,8 +29,6 @@
       });
     });
   });
-
-  jQuery(function () {});
 
 }));
 //# sourceMappingURL=script.js.map

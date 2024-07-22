@@ -45,24 +45,28 @@
         </a>
         <!-- Modal -->
         <div class="modal fade" id="portofolioModal" tabindex="-1" aria-labelledby="portofolioModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
+            <div class="frame-modal-portofolio">
+                <div class="content-portofolio">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="portofolioModalLabel">Pilih Kategori</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="close-modal-portofolio" data-bs-dismiss="modal" aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body-portofolio">
                         <ul class="list-group">
                             <?php
                             foreach ($data as $category) {
                                 if (in_array($category['slug'], $portofolio_selection)) {
                                     ?>
-                                    <a href="?jenis_web=<?php echo $category['slug']; ?>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+                                    <a href="?jenis_web=<?php echo $category['slug']; ?>" class="list-portofolio">
                                         <div class="ms-2 me-auto">
                                             <div class="fw-bold text-start"><b><?php echo $category['category']; ?></b></div>
                                             Demo website <?php echo $category['category']; ?>
                                         </div>
-                                        <span class="badge bg-danger rounded-pill">
+                                        <span class="badge-portofolio">
                                             <?php echo $category['count']; ?>
                                         </span>
                                     </a>
@@ -158,7 +162,7 @@ function portofolio_custom_masonry_shortcode($atts) {
             $images = ($style_thumbnail == 'thumbnail') ? $item['thumbnail_url'] : $item['screenshot'];
             ?>
             <div class="col-portofolio">
-                <div class="card">
+                <div class="card-portofolio">
                     <div class="position-relative">
                         <img src="<?php echo esc_url($images); ?>" class="card-img-top" alt="<?php echo esc_attr($item['title']); ?>">
                         <?php
@@ -170,7 +174,7 @@ function portofolio_custom_masonry_shortcode($atts) {
                     </div>
                     <div class="card-body">
                         <?php if ($a['title'] != 'no') { ?>
-                            <h5 class="card-title h6"><?php echo esc_html($item['title']); ?></h5>
+                            <h5 class="portofolio-title"><?php echo esc_html($item['title']); ?></h5>
                         <?php } ?>
                         <div class="group-btn-portfolio" role="group" aria-label="Basic example">
                             <a class="btn-preview-portfolio" target="_blank" href="<?php echo get_the_permalink($preview_page); ?>?id=<?php echo esc_html($item['id']); ?>">

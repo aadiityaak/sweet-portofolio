@@ -164,7 +164,63 @@ $white-color: #fff;
     }
   }
 }
-
+.frame-modal-portofolio {
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  backdrop-filter: blur(9px);
+  margin: 20vh auto;
+  max-width: 600px;
+  .list-group {
+    padding: 0;
+    .list-group-item {
+      border: none;
+      background: none;
+    }
+  }
+}
+.content-portofolio {
+  .close-modal-portofolio {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .modal-body-portofolio {
+    padding: 0 1rem;
+    overflow-y: auto;
+  }
+  .list-portofolio {
+    position: relative;
+    display: block;
+    padding: 10px 0;
+    .badge-portofolio {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: slateblue;
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: 14px;
+      padding: 5px 7px;
+      border-radius: 5px;
+    }
+  }
+}
+.card-portofolio {
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 7px;
+  padding: 10px;
+  background: #fff;
+}
+.portofolio-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
 .frame-portofolio {
   display: flex;
   flex-direction: row;

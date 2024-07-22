@@ -9,9 +9,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   // Close modal
-  document.querySelector(".btn-close").addEventListener("click", function () {
-    this.closest(".modal").style.display = "none";
-  });
+  document
+    .querySelector(".close-modal-portofolio")
+    .addEventListener("click", function () {
+      this.closest(".modal").style.display = "none";
+    });
 
   // Close modal on clicking outside
   window.addEventListener("click", function (event) {
