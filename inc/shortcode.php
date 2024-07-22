@@ -153,11 +153,11 @@ function portofolio_custom_masonry_shortcode($atts) {
     $end_index = $start_index + $items_per_page;
     $current_page_data = array_slice($data, $start_index, $items_per_page);
     ?>
-    <div class="row g-3">
+    <div class="frame-portofolio">
         <?php foreach ($current_page_data as $item) {
             $images = ($style_thumbnail == 'thumbnail') ? $item['thumbnail_url'] : $item['screenshot'];
             ?>
-            <div class="col-md-4">
+            <div class="col-portofolio">
                 <div class="card">
                     <div class="position-relative">
                         <img src="<?php echo esc_url($images); ?>" class="card-img-top" alt="<?php echo esc_attr($item['title']); ?>">
@@ -172,8 +172,14 @@ function portofolio_custom_masonry_shortcode($atts) {
                         <?php if ($a['title'] != 'no') { ?>
                             <h5 class="card-title h6"><?php echo esc_html($item['title']); ?></h5>
                         <?php } ?>
-                        <div class="btn-group w-100" role="group" aria-label="Basic example">
-                            <a class="btn btn-primary" target="_blank" href="<?php echo get_the_permalink($preview_page); ?>?id=<?php echo esc_html($item['id']); ?>">Preview</a>
+                        <div class="group-btn-portfolio" role="group" aria-label="Basic example">
+                            <a class="btn-preview-portfolio" target="_blank" href="<?php echo get_the_permalink($preview_page); ?>?id=<?php echo esc_html($item['id']); ?>">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                            </svg>
+                                Preview
+                            </a>
                             <?php
                             $whatsapp_number = get_option('portofolio_whatsapp_number'); // Prefix added to option name
                             $whatsapp_number = preg_replace('/[^0-9]/', '', $whatsapp_number);
@@ -183,7 +189,7 @@ function portofolio_custom_masonry_shortcode($atts) {
                                 $whatsapp_message = "Saya tertarik dengan " . urlencode($item['title']);
                                 $whatsapp_url = "https://wa.me/$whatsapp_number?text=" . urlencode($whatsapp_message);
                                 ?>
-                                <a target="_blank" href="<?php echo esc_url($whatsapp_url); ?>" class="btn btn-success">Order</a>
+                                <a target="_blank" href="<?php echo esc_url($whatsapp_url); ?>" class="btn-whatsapp-portfolio">Order</a>
                             <?php } ?>
                         </div>
                     </div>
