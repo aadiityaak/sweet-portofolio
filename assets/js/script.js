@@ -1,5 +1,5 @@
 /*!
-  * Sweetweb v1.0.4 (https://websweetstudio.com)
+  * Sweetweb v1.0.6 (https://websweetstudio.com)
   * Copyright 2013-2024 websweetstudio.com
   * Licensed under GPL (http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
   */
@@ -9,24 +9,32 @@
 })((function () { 'use strict';
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Open modal
-    document.querySelector('[data-bs-toggle="modal"]').addEventListener("click", function () {
-      document.querySelector(this.getAttribute("data-bs-target")).style.display = "block";
-    });
+    // Get the modal elements
+    const modalTrigger = document.querySelector(".btn-modal-portofolio");
+    const modal = document.querySelector(".frame-modal-portofolio");
+    const closeModalBtn = document.querySelector(".close-modal-portofolio");
 
-    // Close modal
-    document.querySelector(".close-modal-portofolio").addEventListener("click", function () {
-      this.closest(".modal").style.display = "none";
-    });
+    // Function to open the modal
+    function openModal() {
+      modal.style.display = "block";
+    }
 
-    // Close modal on clicking outside
+    // Function to close the modal
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    // Event listener to open the modal when button is clicked
+    modalTrigger.addEventListener("click", openModal);
+
+    // Event listener to close the modal when close button is clicked
+    closeModalBtn.addEventListener("click", closeModal);
+
+    // Event listener to close the modal when clicking outside of the modal content
     window.addEventListener("click", function (event) {
-      const modals = document.querySelectorAll(".modal");
-      modals.forEach(function (modal) {
-        if (event.target === modal) {
-          modal.style.display = "none";
-        }
-      });
+      if (event.target === modal) {
+        closeModal();
+      }
     });
   });
 
