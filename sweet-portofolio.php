@@ -11,7 +11,7 @@
  * Plugin Name:   Sweet Portofolio
  * Plugin URI:    Portofolio Website Simple untuk mitra websweetstudio.com
  * Description:   Plugin untuk web utama
- * Version:       1.0.6
+ * Version:       1.0.605
  * Author:        Aditya K
  * Author URI:    https://websweetstudio.com
  * Text Domain:   sweet-portofolio

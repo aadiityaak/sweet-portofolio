@@ -38,7 +38,7 @@ $data_title = $data['title'] ?? '';
 </head>
 
 <body <?php body_class('wss-preview-page'); ?>>
-    <header class="header-preview d-flex justify-content-between align-items-center p-2 bg-dark shadow-sm">
+    <header class="header-preview">
         <!-- Back to Home Button -->
         <a class="btn btn-primary btn-sm align-middle" href="<?php echo get_the_permalink($portofolio_page); ?>">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">

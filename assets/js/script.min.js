@@ -1,5 +1,5 @@
 /*!
-  * Sweetweb v1.0.6 (https://websweetstudio.com)
+  * Sweetweb v1.0.605 (https://websweetstudio.com)
   * Copyright 2013-2024 websweetstudio.com
   * Licensed under GPL (http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
   */
