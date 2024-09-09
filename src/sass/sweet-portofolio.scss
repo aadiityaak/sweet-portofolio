@@ -4,7 +4,12 @@
 $primary-color: #0d6efd;
 $primary-hover-color: #0b5ed7;
 $white-color: #fff;
+$text-color: #333;
 
+.frame-modal-portofolio a {
+  color: $text-color !important;
+  text-decoration: none;
+}
 /* Button Styling */
 .btn-primary {
   background-color: $primary-color;
@@ -83,6 +88,10 @@ $white-color: #fff;
   &:hover {
     background-color: #f8f9fa;
   }
+}
+
+.portofolio-text-start {
+  text-align: start;
 }
 
 /* Button Group Styling */
@@ -255,6 +264,7 @@ a.btn-modal-portofolio {
   font-size: 1.5rem;
   font-weight: bold;
   color: #000;
+  padding: 10px 0;
 }
 
 /* Frame Portfolio Styling */

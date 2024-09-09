@@ -27,6 +27,11 @@
 }
 
 /* Colors */
+.frame-modal-portofolio a {
+  color: #333 !important;
+  text-decoration: none;
+}
+
 /* Button Styling */
 .btn-primary {
   background-color: #0d6efd;
@@ -103,6 +108,10 @@
 }
 .list-group-item:hover {
   background-color: #f8f9fa;
+}
+
+.portofolio-text-start {
+  text-align: start;
 }
 
 /* Button Group Styling */
@@ -268,6 +277,7 @@ a.btn-modal-portofolio:hover {
   font-size: 1.5rem;
   font-weight: bold;
   color: #000;
+  padding: 10px 0;
 }
 
 /* Frame Portfolio Styling */

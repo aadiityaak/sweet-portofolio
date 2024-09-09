@@ -61,8 +61,8 @@
                             if (in_array($category['slug'], $portofolio_selection)) {
                                 ?>
                                 <a href="?jenis_web=<?php echo $category['slug']; ?>" class="list-portofolio">
-                                    <div class="ms-2 me-auto">
-                                        <div class="fw-bold text-start"><b><?php echo $category['category']; ?></b></div>
+                                    <div class="ms-2 me-auto portofolio-text-start">
+                                        <div class="fw-bold portofolio-text-start"><b><?php echo $category['category']; ?></b></div>
                                         Demo website <?php echo $category['category']; ?>
                                     </div>
                                     <span class="badge-portofolio">
