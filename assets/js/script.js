@@ -10,6 +10,7 @@
 
   // Alpine.js initialization
   document.addEventListener('alpine:init', () => {
+    console.log('Alpine.js initialized');
     // Modal component for category selection
     Alpine.data('categoryModal', () => ({
       modalOpen: false,
@@ -17,6 +18,7 @@
       selectedCategory: '',
       
       init() {
+        console.log('Initializing category modal');
         const categoriesData = document.querySelector('#categories-data');
         if (categoriesData) {
           try {
@@ -27,14 +29,24 @@
             this.categories = [];
           }
         }
+        
+        // Check if there's a category in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryFromUrl = urlParams.get('jenis_web');
+        if (categoryFromUrl) {
+          this.selectedCategory = categoryFromUrl;
+        }
       },
       
       selectCategory(categorySlug) {
         console.log('Category selected:', categorySlug);
         console.log('Category object:', this.categories.find(cat => cat.slug === categorySlug));
         
-        this.selectedCategory = categorySlug;
+        // Close modal immediately
         this.modalOpen = false;
+        
+        // Update selected category
+        this.selectedCategory = categorySlug;
         
         // Update URL without page reload
         const url = new URL(window.location);
@@ -45,9 +57,6 @@
         // Trigger a custom event to notify the portfolio component
         console.log('Dispatching categoryChanged event');
         window.dispatchEvent(new CustomEvent('categoryChanged', { detail: { category: categorySlug } }));
-        
-        // Also trigger a popstate event to ensure URL changes are detected
-        window.dispatchEvent(new PopStateEvent('popstate'));
         
         // Force a page reload to ensure the portfolio grid is updated
         setTimeout(() => {
@@ -207,7 +216,7 @@
     }));
   });
 
-  // Fallback for browsers without Alpine.js
+  // Fallback for browsers without Alpine.js and to handle double-click issue
   document.addEventListener("DOMContentLoaded", function () {
     // Get the modal elements
     const modalTrigger = document.querySelector(".btn-modal-portofolio");
@@ -216,13 +225,39 @@
 
     if (modalTrigger && modal && closeModalBtn) {
       // Function to open the modal
-      function openModal() {
+      function openModal(event) {
+        event.preventDefault();
+        console.log('Opening modal via fallback');
         modal.style.display = "block";
+        
+        // Try to set modalOpen to true if Alpine is available
+        if (window.Alpine && window.Alpine.$store) {
+          // This is a fallback in case Alpine.js is not fully initialized
+          setTimeout(() => {
+            const modalComponent = Alpine.$data(modal.parentElement);
+            if (modalComponent) {
+              modalComponent.modalOpen = true;
+            }
+          }, 50);
+        }
       }
 
       // Function to close the modal
-      function closeModal() {
+      function closeModal(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log('Closing modal via fallback');
         modal.style.display = "none";
+        
+        // Try to set modalOpen to false if Alpine is available
+        if (window.Alpine && window.Alpine.$store) {
+          setTimeout(() => {
+            const modalComponent = Alpine.$data(modal.parentElement);
+            if (modalComponent) {
+              modalComponent.modalOpen = false;
+            }
+          }, 50);
+        }
       }
 
       // Event listener to open the modal when button is clicked
@@ -230,6 +265,54 @@
 
       // Event listener to close the modal when close button is clicked
       closeModalBtn.addEventListener("click", closeModal);
+      
+      // Event listeners for category items
+      const categoryItems = document.querySelectorAll(".list-portofolio");
+      categoryItems.forEach(item => {
+        item.addEventListener("click", function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Get category from the element
+          const categoryText = this.querySelector('.fw-bold').textContent;
+          console.log('Category clicked via fallback:', categoryText);
+          
+          // Find matching category from data
+          const categoriesData = document.querySelector('#categories-data');
+          if (categoriesData) {
+            try {
+              const categories = JSON.parse(categoriesData.textContent) || [];
+              const category = categories.find(cat => cat.category === categoryText);
+              if (category) {
+                const categorySlug = category.slug || category.category;
+                
+                // Update URL
+                const url = new URL(window.location);
+                url.searchParams.set('jenis_web', categorySlug);
+                url.searchParams.delete('halaman'); // Reset to page 1
+                window.history.pushState({}, '', url);
+                
+                // Close modal
+                closeModal(e);
+                
+                // Reload page
+                setTimeout(() => {
+                  window.location.reload();
+                }, 100);
+              }
+            } catch (e) {
+              console.error('Error parsing categories data:', e);
+            }
+          }
+        });
+      });
+      
+      // Close modal when clicking outside
+      modal.addEventListener("click", function(e) {
+        if (e.target === modal) {
+          closeModal(e);
+        }
+      });
 
       // Event listener to close the modal when clicking outside of the modal content
       window.addEventListener("click", function (event) {

@@ -33,6 +33,11 @@
   display: none !important;
 }
 
+/* Alpine.js x-cloak styling */
+[x-cloak] {
+  display: none !important;
+}
+
 /* Colors */
 .frame-modal-portofolio a {
   color: #333 !important;
@@ -226,6 +231,11 @@ a.btn-modal-portofolio:active, button.btn-modal-portofolio:active {
   width: 100%;
   height: 100%;
   z-index: 999;
+}
+
+/* Override display when modal is shown by Alpine.js */
+.frame-modal-portofolio[x-show="true"] {
+  display: block !important;
 }
 .frame-modal-portofolio .modal-header {
   padding: 1rem 2rem;

@@ -15,7 +15,7 @@
     wp_enqueue_script( 'jquery' );
     
     // Add Alpine.js CDN with defer attribute
-    wp_enqueue_script( 'alpine-js', 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', array(), '3.13.3', true );
+    wp_enqueue_script( 'alpine-js', 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', array(), '3.13.3', false );
     
     // Add defer attribute to Alpine.js script
     add_filter('script_loader_tag', function($tag, $handle, $src) {
@@ -25,7 +25,7 @@
         return $tag;
     }, 10, 3);
     
-    wp_enqueue_script( 'sweet-portofolio-script', SWEETPORTOFOLIO_URL. 'assets/js/script.js', array( 'jquery', 'alpine-js' ), SWEETPORTOFOLIO_VERSION );
+    wp_enqueue_script( 'sweet-portofolio-script', SWEETPORTOFOLIO_URL. 'assets/js/script.js', array( 'jquery' ), SWEETPORTOFOLIO_VERSION, true );
 
 }
 add_action('wp_enqueue_scripts', 'sweet_portofolio_admin_style');
