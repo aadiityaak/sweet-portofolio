@@ -279,10 +279,6 @@ function portofolio_custom_masonry_shortcode($atts)
                         <div class="card-image">
                             <img :src="getImageUrl(item)" :alt="item.title" @error="$event.target.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'">
                             <span x-show="portofolioCredit" class="card-credit" x-text="portofolioCredit"></span>
-                        </div>
-                        <div class="card-content">
-                            <h3 x-show="showTitle !== 'no'" class="card-title" x-text="item.title"></h3>
-                            <p x-show="item.excerpt" class="card-excerpt" x-text="item.excerpt"></p>
                             <div class="card-actions">
                                 <a :href="getPreviewUrl(item)" class="btn-preview" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -298,6 +294,10 @@ function portofolio_custom_masonry_shortcode($atts)
                                 </a>
                             </div>
                         </div>
+                        <div class="card-content">
+                            <h3 x-show="showTitle !== 'no'" class="card-title" x-text="item.title"></h3>
+                            <p x-show="item.excerpt" class="card-excerpt" x-text="item.excerpt"></p>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -312,6 +312,10 @@ function portofolio_custom_masonry_shortcode($atts)
             <template x-for="page in getVisiblePages()" :key="'page-' + page">
                 <button @click="goToPage(page)" class="pagination-btn" :class="{'active': page === currentPage}" x-text="page"></button>
             </template>
+
+            <div class="pagination-info">
+                <span x-text="`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filteredPortfolios.length)} dari ${filteredPortfolios.length} items`"></span>
+            </div>
 
             <button @click="goToPage(currentPage + 1)" class="pagination-btn" :class="{'disabled': currentPage === totalPages}" :disabled="currentPage === totalPages" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
