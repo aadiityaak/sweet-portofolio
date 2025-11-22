@@ -12,24 +12,7 @@
   border-radius: 0 20px 20px 0;
   font-size: 11px;
 }
-.wss-preview-page .header-preview {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: nowrap;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  padding: 5px;
-}
-.wss-preview-page #iframe-container iframe {
-  height: 100vh;
-  padding-top: 47px;
-}
+
 .wss-preview-page .page-template-page-preview-php .whatsapp-floating {
   display: none !important;
 }
