@@ -82,7 +82,7 @@ function sweet_portofolio_jenis_web_shortcode()
                     </div>
                     <div class="modal-body-portofolio">
                         <ul class="list-group">
-                            <template x-for="category in categories.filter(cat => '<?php echo implode(',', $portofolio_selection); ?>'.includes(cat.slug))" :key="category.slug">
+                            <template x-for="(category, index) in categories.filter(cat => '<?php echo implode(',', $portofolio_selection); ?>'.includes(cat.slug))" :key="'category-' + (category.slug || index)">
                                 <a @click="selectCategory(category.slug)" class="list-portofolio">
                                     <div class="ms-2 me-auto portofolio-text-start">
                                         <div class="fw-bold portofolio-text-start"><b x-text="category.category"></b></div>
@@ -231,7 +231,7 @@ function portofolio_custom_masonry_shortcode($atts)
         </div>
 
         <div class="frame-portofolio">
-            <template x-for="item in paginatedPortfolios" :key="item.id">
+            <template x-for="(item, index) in paginatedPortfolios" :key="'portfolio-' + (item.id || index)">
                 <div class="col-portofolio">
                     <div class="card-portofolio">
                         <div class="position-relative">
@@ -263,7 +263,7 @@ function portofolio_custom_masonry_shortcode($atts)
         <!-- Pagination with Alpine.js -->
         <nav x-show="totalPages > 1" aria-label="Page navigation" class="pt-3">
             <ul class="pagination justify-content-center">
-                <template x-for="page in totalPages" :key="page">
+                <template x-for="page in totalPages" :key="'page-' + page">
                     <li :class="{'page-item': true, 'active': page === currentPage}">
                         <a @click="goToPage(page)" class="page-link" href="javascript:void(0)" x-text="page"></a>
                     </li>

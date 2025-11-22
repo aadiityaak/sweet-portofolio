@@ -19,7 +19,12 @@
       init() {
         const categoriesData = document.querySelector('#categories-data');
         if (categoriesData) {
-          this.categories = JSON.parse(categoriesData.textContent);
+          try {
+            this.categories = JSON.parse(categoriesData.textContent) || [];
+          } catch (e) {
+            console.error('Error parsing categories data:', e);
+            this.categories = [];
+          }
         }
       },
       
@@ -56,8 +61,13 @@
       init() {
         const portfoliosData = document.querySelector('#portfolios-data');
         if (portfoliosData) {
-          this.portfolios = JSON.parse(portfoliosData.textContent);
-          this.filterPortfolios();
+          try {
+            this.portfolios = JSON.parse(portfoliosData.textContent) || [];
+            this.filterPortfolios();
+          } catch (e) {
+            console.error('Error parsing portfolios data:', e);
+            this.portfolios = [];
+          }
         }
         
         // Listen for URL changes
@@ -87,13 +97,18 @@
         // Reset to page 1 when filter changes
         this.currentPage = 1;
         
+        // Ensure portfolios is an array
+        if (!Array.isArray(this.portfolios)) {
+          this.portfolios = [];
+        }
+        
         if (this.selectedCategory && this.selectedCategory !== '') {
           this.filteredPortfolios = this.portfolios.filter(portfolio => 
-            portfolio.jenis && portfolio.jenis.includes(this.selectedCategory)
+            portfolio && portfolio.jenis && portfolio.jenis.includes(this.selectedCategory)
           );
-        } else if (this.portofolioSelection && this.portofolioSelection.length > 0) {
+        } else if (this.portofolioSelection && Array.isArray(this.portofolioSelection) && this.portofolioSelection.length > 0) {
           this.filteredPortfolios = this.portfolios.filter(portfolio => 
-            portfolio.jenis && this.portofolioSelection.includes(portfolio.jenis)
+            portfolio && portfolio.jenis && this.portofolioSelection.includes(portfolio.jenis)
           );
         } else {
           this.filteredPortfolios = [...this.portfolios];
@@ -120,27 +135,35 @@
       },
       
       get paginatedPortfolios() {
+        if (!Array.isArray(this.filteredPortfolios)) {
+          return [];
+        }
         const start = (this.currentPage - 1) * this.itemsPerPage;
         const end = start + this.itemsPerPage;
         return this.filteredPortfolios.slice(start, end);
       },
       
       get totalPages() {
+        if (!Array.isArray(this.filteredPortfolios)) {
+          return 1;
+        }
         return Math.ceil(this.filteredPortfolios.length / this.itemsPerPage);
       },
       
       getWhatsAppUrl(portfolio) {
-        if (!this.whatsappNumber) return '#';
+        if (!this.whatsappNumber || !portfolio || !portfolio.title) return '#';
         const message = 'Saya tertarik dengan ' + portfolio.title;
         return 'https://wa.me/' + this.whatsappNumber + '?text=' + encodeURIComponent(message);
       },
       
       getPreviewUrl(portfolio) {
+        if (!portfolio || !portfolio.id) return '#';
         return this.previewPage + '?id=' + portfolio.id;
       },
       
       getImageUrl(portfolio) {
-        return this.styleThumbnail === 'thumbnail' ? portfolio.thumbnail_url : portfolio.screenshot;
+        if (!portfolio) return '';
+        return this.styleThumbnail === 'thumbnail' ? (portfolio.thumbnail_url || '') : (portfolio.screenshot || '');
       }
     }));
   });
