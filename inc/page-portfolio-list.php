@@ -118,6 +118,11 @@ $categories_data = get_transient('jenis_web_data');
         margin-top: 0;
     }
 
+    .site-main {
+        width: 100%;
+        max-width: 100%;
+    }
+
 
 
     /* Portfolio Container Styles */
@@ -161,6 +166,7 @@ $categories_data = get_transient('jenis_web_data');
 
     .col-portofolio {
         width: 100%;
+        position: relative;
     }
 
     .card-portofolio {
@@ -169,6 +175,9 @@ $categories_data = get_transient('jenis_web_data');
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        width: 100%;
+        height: 100%;
+        position: relative;
     }
 
     .card-portofolio:hover {
@@ -180,6 +189,11 @@ $categories_data = get_transient('jenis_web_data');
         position: relative;
         overflow: hidden;
         height: 200px;
+        width: 100%;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .card-image img {
@@ -187,6 +201,9 @@ $categories_data = get_transient('jenis_web_data');
         height: 100%;
         object-fit: cover;
         transition: transform 0.3s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
     .card-portofolio:hover .card-image img {
@@ -217,10 +234,15 @@ $categories_data = get_transient('jenis_web_data');
         background: rgba(0, 0, 0, 0.7);
         opacity: 0;
         transition: opacity 0.3s ease;
+        z-index: 2;
+        pointer-events: none;
+        box-sizing: border-box;
+        padding: 20px;
     }
 
     .card-image:hover .card-actions {
         opacity: 1;
+        pointer-events: auto;
     }
 
     .btn-preview,
@@ -234,6 +256,11 @@ $categories_data = get_transient('jenis_web_data');
         font-weight: 500;
         text-decoration: none;
         transition: all 0.2s ease;
+        z-index: 3;
+        position: relative;
+        cursor: pointer;
+        pointer-events: auto;
+        max-width: 120px;
     }
 
     .btn-preview {
@@ -244,6 +271,7 @@ $categories_data = get_transient('jenis_web_data');
     .btn-preview:hover {
         background-color: #0069d9;
         transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
     }
 
     .btn-whatsapp {
@@ -254,6 +282,7 @@ $categories_data = get_transient('jenis_web_data');
     .btn-whatsapp:hover {
         background-color: #128c7e;
         transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(37, 211, 102, 0.3);
     }
 
     .card-content {
@@ -270,6 +299,7 @@ $categories_data = get_transient('jenis_web_data');
         color: #212529;
         text-decoration: none;
         transition: color 0.2s ease;
+        display: block;
     }
 
     .card-title-link:hover {
@@ -352,10 +382,7 @@ $categories_data = get_transient('jenis_web_data');
             padding: 15px;
         }
 
-        .frame-portofolio {
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-        }
+
 
         .filter-row {
             flex-direction: column;

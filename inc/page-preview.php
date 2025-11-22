@@ -48,7 +48,7 @@ $data_title = $data['title'] ?? '';
         }
 
         html {
-            margin: 0;
+            margin: 0 !important;
             padding: 0;
             height: 100%;
         }
