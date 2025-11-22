@@ -13,8 +13,18 @@
 
 function sweet_portofolio_jenis_web_shortcode()
 {
+    // Don't render in admin area
+    if (is_admin()) {
+        return '';
+    }
+
     $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
     $portofolio_selection = get_option('portofolio_selection');
+
+    // Ensure portofolio_selection is an array
+    if (!is_array($portofolio_selection)) {
+        $portofolio_selection = array();
+    }
 
     // Cek apakah data sudah ada dalam transient
     $data = get_transient('jenis_web_data');
@@ -35,41 +45,15 @@ function sweet_portofolio_jenis_web_shortcode()
         $transient_set = set_transient($transient_key, $data, 12 * 3600);
     }
 
-    if (!empty($data)) {
+    if (!empty($data) && is_array($data)) {
         ob_start();
-        $buttons_markup = '';
 
         // Add data for Alpine.js
         echo '<script type="text/plain" id="categories-data">' . json_encode($data) . '</script>';
 
         // Alpine.js modal component
 ?>
-        <div x-data="{
-            modalOpen: false,
-            categories: [],
-            selectedCategory: '',
-            
-            init() {
-                const categoriesData = document.querySelector('#categories-data');
-                if (categoriesData) {
-                    this.categories = JSON.parse(categoriesData.textContent);
-                }
-            },
-            
-            selectCategory(categorySlug) {
-                this.selectedCategory = categorySlug;
-                this.modalOpen = false;
-                
-                // Update URL without page reload
-                const url = new URL(window.location);
-                url.searchParams.set('jenis_web', categorySlug);
-                url.searchParams.delete('halaman'); // Reset to page 1
-                window.history.pushState({}, '', url);
-                
-                // Trigger a custom event to notify the portfolio component
-                window.dispatchEvent(new CustomEvent('categoryChanged', { detail: { category: categorySlug } }));
-            }
-        }">
+        <div x-data="categoryModal">
             <button @click="modalOpen = true" class="btn-modal-portofolio">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-diagram-3" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z" />
@@ -123,6 +107,11 @@ add_shortcode('sweet-portofolio-jenis-web', 'sweet_portofolio_jenis_web_shortcod
 
 function portofolio_custom_masonry_shortcode($atts)
 {
+    // Don't render in admin area
+    if (is_admin()) {
+        return '';
+    }
+
     $a = shortcode_atts(array(
         'default' => '',
         'include' => '',
@@ -138,6 +127,11 @@ function portofolio_custom_masonry_shortcode($atts)
     $portofolio_selection = get_option('portofolio_selection');
     $whatsapp_number = get_option('portofolio_whatsapp_number');
     $portofolio_credit = get_option('portofolio_credit');
+
+    // Ensure portofolio_selection is an array
+    if (!is_array($portofolio_selection)) {
+        $portofolio_selection = array();
+    }
 
     // Clean WhatsApp number
     $whatsapp_number = preg_replace('/[^0-9]/', '', $whatsapp_number);
@@ -168,127 +162,38 @@ function portofolio_custom_masonry_shortcode($atts)
     }
 
     // Filter data based on include parameter
-    if (isset($a['include']) && $a['include'] != '') {
+    if (isset($a['include']) && $a['include'] != '' && is_array($data)) {
         $includes = explode(',', $a['include']);
         $data = array_filter($data, function ($item) use ($includes) {
             if (is_array($item)) {
                 return isset($item['id']) && in_array($item['id'], $includes);
             }
+            return false;
         });
     }
 
     // Add data for Alpine.js
-    echo '<script type="text/plain" id="portfolios-data">' . json_encode(array_values($data)) . '</script>';
+    if (is_array($data)) {
+        echo '<script type="text/plain" id="portfolios-data">' . json_encode(array_values($data)) . '</script>';
+    } else {
+        echo '<script type="text/plain" id="portfolios-data">[]</script>';
+    }
 
     // Get current page from URL
     $current_page = isset($_GET['halaman']) ? (int)$_GET['halaman'] : 1;
 
     // Alpine.js portfolio component
     ?>
-    <div x-data="{
-        filterFormOpen: false,
-        portfolios: [],
-        filteredPortfolios: [],
-        currentPage: <?php echo $current_page; ?>,
-        itemsPerPage: 12,
-        selectedCategory: '<?php echo $jenis_web; ?>',
-        showTitle: '<?php echo $a['title']; ?>',
-        styleThumbnail: '<?php echo $style_thumbnail; ?>',
-        previewPage: '<?php echo get_the_permalink($preview_page); ?>',
-        whatsappNumber: '<?php echo $whatsapp_number; ?>',
-        portofolioCredit: '<?php echo $portofolio_credit; ?>',
-        portofolioSelection: <?php echo json_encode($portofolio_selection); ?>,
-        
-        init() {
-            const portfoliosData = document.querySelector('#portfolios-data');
-            if (portfoliosData) {
-                this.portfolios = JSON.parse(portfoliosData.textContent);
-                this.filterPortfolios();
-            }
-            
-            // Listen for URL changes
-            window.addEventListener('popstate', () => {
-                this.updateFromURL();
-            });
-            
-            // Listen for category changes from modal
-            window.addEventListener('categoryChanged', (event) => {
-                this.selectedCategory = event.detail.category;
-                this.currentPage = 1; // Reset to page 1
-                this.filterPortfolios();
-            });
-            
-            // Initial filter
-            this.updateFromURL();
-        },
-        
-        updateFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            this.selectedCategory = urlParams.get('jenis_web') || '<?php echo $a['default']; ?>';
-            this.currentPage = parseInt(urlParams.get('halaman')) || 1;
-            this.filterPortfolios();
-        },
-        
-        filterPortfolios() {
-            // Reset to page 1 when filter changes
-            this.currentPage = 1;
-            
-            if (this.selectedCategory && this.selectedCategory !== '') {
-                this.filteredPortfolios = this.portfolios.filter(portfolio => 
-                    portfolio.jenis && portfolio.jenis.includes(this.selectedCategory)
-                );
-            } else if (this.portofolioSelection && this.portofolioSelection.length > 0) {
-                this.filteredPortfolios = this.portfolios.filter(portfolio => 
-                    portfolio.jenis && this.portofolioSelection.includes(portfolio.jenis)
-                );
-            } else {
-                this.filteredPortfolios = [...this.portfolios];
-            }
-            
-            // Update URL when filter changes
-            this.updateURL();
-        },
-        
-        goToPage(page) {
-            this.currentPage = page;
-            this.updateURL();
-        },
-        
-        updateURL() {
-            const url = new URL(window.location);
-            if (this.selectedCategory && this.selectedCategory !== '') {
-                url.searchParams.set('jenis_web', this.selectedCategory);
-            } else {
-                url.searchParams.delete('jenis_web');
-            }
-            url.searchParams.set('halaman', this.currentPage);
-            window.history.pushState({}, '', url);
-        },
-        
-        get paginatedPortfolios() {
-            const start = (this.currentPage - 1) * this.itemsPerPage;
-            const end = start + this.itemsPerPage;
-            return this.filteredPortfolios.slice(start, end);
-        },
-        
-        get totalPages() {
-            return Math.ceil(this.filteredPortfolios.length / this.itemsPerPage);
-        },
-        
-        getWhatsAppUrl(portfolio) {
-            if (!this.whatsappNumber) return '#';
-            const message = 'Saya tertarik dengan ' + portfolio.title;
-            return 'https://wa.me/' + this.whatsappNumber + '?text=' + encodeURIComponent(message);
-        },
-        
-        getPreviewUrl(portfolio) {
-            return this.previewPage + '?id=' + portfolio.id;
-        },
-        
-        getImageUrl(portfolio) {
-            return this.styleThumbnail === 'thumbnail' ? portfolio.thumbnail_url : portfolio.screenshot;
-        }
-    }">
+    <div x-data="portfolioGrid(
+        <?php echo $current_page; ?>,
+        '<?php echo $jenis_web; ?>',
+        '<?php echo $a['title']; ?>',
+        '<?php echo $style_thumbnail; ?>',
+        '<?php echo !empty($preview_page) ? get_the_permalink($preview_page) : ''; ?>',
+        '<?php echo $whatsapp_number; ?>',
+        '<?php echo $portofolio_credit; ?>',
+        <?php echo json_encode($portofolio_selection); ?>
+    )">
         <!-- Filter Form with Alpine.js -->
         <div class="filter-section mb-3">
             <div class="row">
@@ -300,9 +205,9 @@ function portofolio_custom_masonry_shortcode($atts)
                             <?php
                             // Get categories for filter dropdown
                             $categories_data = get_transient('jenis_web_data');
-                            if ($categories_data && !empty($portofolio_selection)) {
+                            if (is_array($categories_data) && !empty($portofolio_selection)) {
                                 foreach ($categories_data as $category) {
-                                    if (in_array($category['slug'], $portofolio_selection)) {
+                                    if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
                                         echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
                                     }
                                 }

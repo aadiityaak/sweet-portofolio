@@ -10,61 +10,113 @@
 
   // Alpine.js initialization
   document.addEventListener('alpine:init', () => {
-    // Global Alpine.js data and methods can be initialized here
-    Alpine.data('portfolioApp', () => ({
+    // Modal component for category selection
+    Alpine.data('categoryModal', () => ({
       modalOpen: false,
       categories: [],
       selectedCategory: '',
-      portfolios: [],
-      filteredPortfolios: [],
-      currentPage: 1,
-      itemsPerPage: 12,
-      previewOpen: false,
-      currentPreview: null,
       
       init() {
-        this.loadCategories();
-        this.loadPortfolios();
-      },
-      
-      loadCategories() {
-        // Categories will be loaded via PHP and passed to Alpine.js
         const categoriesData = document.querySelector('#categories-data');
         if (categoriesData) {
           this.categories = JSON.parse(categoriesData.textContent);
         }
       },
       
-      loadPortfolios() {
-        // Portfolios will be loaded via PHP and passed to Alpine.js
+      selectCategory(categorySlug) {
+        this.selectedCategory = categorySlug;
+        this.modalOpen = false;
+        
+        // Update URL without page reload
+        const url = new URL(window.location);
+        url.searchParams.set('jenis_web', categorySlug);
+        url.searchParams.delete('halaman'); // Reset to page 1
+        window.history.pushState({}, '', url);
+        
+        // Trigger a custom event to notify the portfolio component
+        window.dispatchEvent(new CustomEvent('categoryChanged', { detail: { category: categorySlug } }));
+      }
+    }));
+    
+    // Portfolio component for filtering and pagination
+    Alpine.data('portfolioGrid', (initialPage = 1, initialCategory = '', showTitle = 'yes', styleThumbnail = '', previewPage = '', whatsappNumber = '', portofolioCredit = '', portofolioSelection = []) => ({
+      filterFormOpen: false,
+      portfolios: [],
+      filteredPortfolios: [],
+      currentPage: initialPage,
+      itemsPerPage: 12,
+      selectedCategory: initialCategory,
+      showTitle: showTitle,
+      styleThumbnail: styleThumbnail,
+      previewPage: previewPage,
+      whatsappNumber: whatsappNumber,
+      portofolioCredit: portofolioCredit,
+      portofolioSelection: portofolioSelection,
+      
+      init() {
         const portfoliosData = document.querySelector('#portfolios-data');
         if (portfoliosData) {
           this.portfolios = JSON.parse(portfoliosData.textContent);
-          this.filteredPortfolios = [...this.portfolios];
+          this.filterPortfolios();
         }
+        
+        // Listen for URL changes
+        window.addEventListener('popstate', () => {
+          this.updateFromURL();
+        });
+        
+        // Listen for category changes from modal
+        window.addEventListener('categoryChanged', (event) => {
+          this.selectedCategory = event.detail.category;
+          this.currentPage = 1; // Reset to page 1
+          this.filterPortfolios();
+        });
+        
+        // Initial filter
+        this.updateFromURL();
       },
       
-      filterByCategory(category) {
-        this.selectedCategory = category;
+      updateFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        this.selectedCategory = urlParams.get('jenis_web') || '';
+        this.currentPage = parseInt(urlParams.get('halaman')) || 1;
+        this.filterPortfolios();
+      },
+      
+      filterPortfolios() {
+        // Reset to page 1 when filter changes
         this.currentPage = 1;
         
-        if (category === '') {
-          this.filteredPortfolios = [...this.portfolios];
-        } else {
+        if (this.selectedCategory && this.selectedCategory !== '') {
           this.filteredPortfolios = this.portfolios.filter(portfolio => 
-            portfolio.jenis && portfolio.jenis.includes(category)
+            portfolio.jenis && portfolio.jenis.includes(this.selectedCategory)
           );
+        } else if (this.portofolioSelection && this.portofolioSelection.length > 0) {
+          this.filteredPortfolios = this.portfolios.filter(portfolio => 
+            portfolio.jenis && this.portofolioSelection.includes(portfolio.jenis)
+          );
+        } else {
+          this.filteredPortfolios = [...this.portfolios];
         }
+        
+        // Update URL when filter changes
+        this.updateURL();
       },
       
-      openPreview(portfolio) {
-        this.currentPreview = portfolio;
-        this.previewOpen = true;
+      goToPage(page) {
+        this.currentPage = page;
+        this.updateURL();
       },
       
-      closePreview() {
-        this.previewOpen = false;
-        this.currentPreview = null;
+      updateURL() {
+        const url = new URL(window.location);
+        if (this.selectedCategory && this.selectedCategory !== '') {
+          url.searchParams.set('jenis_web', this.selectedCategory);
+        } else {
+          url.searchParams.delete('jenis_web');
+        }
+        url.searchParams.set('halaman', this.currentPage);
+        window.history.pushState({}, '', url);
       },
       
       get paginatedPortfolios() {
@@ -77,8 +129,18 @@
         return Math.ceil(this.filteredPortfolios.length / this.itemsPerPage);
       },
       
-      goToPage(page) {
-        this.currentPage = page;
+      getWhatsAppUrl(portfolio) {
+        if (!this.whatsappNumber) return '#';
+        const message = 'Saya tertarik dengan ' + portfolio.title;
+        return 'https://wa.me/' + this.whatsappNumber + '?text=' + encodeURIComponent(message);
+      },
+      
+      getPreviewUrl(portfolio) {
+        return this.previewPage + '?id=' + portfolio.id;
+      },
+      
+      getImageUrl(portfolio) {
+        return this.styleThumbnail === 'thumbnail' ? portfolio.thumbnail_url : portfolio.screenshot;
       }
     }));
   });

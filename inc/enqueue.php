@@ -14,8 +14,16 @@
     wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL.'assets/css/style.css', array(), SWEETPORTOFOLIO_VERSION);
     wp_enqueue_script( 'jquery' );
     
-    // Add Alpine.js CDN
+    // Add Alpine.js CDN with defer attribute
     wp_enqueue_script( 'alpine-js', 'https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js', array(), '3.13.3', true );
+    
+    // Add defer attribute to Alpine.js script
+    add_filter('script_loader_tag', function($tag, $handle, $src) {
+        if ($handle === 'alpine-js') {
+            return str_replace(' src', ' defer src', $tag);
+        }
+        return $tag;
+    }, 10, 3);
     
     wp_enqueue_script( 'sweet-portofolio-script', SWEETPORTOFOLIO_URL. 'assets/js/script.js', array( 'jquery', 'alpine-js' ), SWEETPORTOFOLIO_VERSION );
 
