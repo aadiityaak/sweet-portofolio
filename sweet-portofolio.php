@@ -1,4 +1,5 @@
 <?php
+
 /**
  * sweet-portofolio
  *
@@ -23,49 +24,58 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if (! defined('ABSPATH')) exit;
 
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'SWEETPORTOFOLIO_VERSION', '1.0.613' );
+define('SWEETPORTOFOLIO_VERSION', '1.0.613');
 
 /**
  * Define plugin path url
  */
-define( 'SWEETPORTOFOLIO_URL', plugin_dir_url( __FILE__ ) );
+define('SWEETPORTOFOLIO_URL', plugin_dir_url(__FILE__));
 
 $files = array(
-  	'inc/shortcode.php',
+    'inc/shortcode.php',
     'inc/enqueue.php',
     'inc/sweet-options.php',
 );
-foreach ( $files as $file ) {
-	require_once plugin_dir_path( __FILE__ ) . $file;
+foreach ($files as $file) {
+    require_once plugin_dir_path(__FILE__) . $file;
 }
 
 //Load template from specific page
-add_filter( 'page_template', 'wpa3396_page_template' );
-function wpa3396_page_template( $page_template ){
+add_filter('page_template', 'wpa3396_page_template');
+function wpa3396_page_template($page_template)
+{
 
-    if ( get_page_template_slug() == 'page-preview.php' ) {
-        $page_template = dirname( __FILE__ ) . '/inc/page-preview.php';
+    if (get_page_template_slug() == 'page-preview.php') {
+        $page_template = dirname(__FILE__) . '/inc/page-preview.php';
     }
+
+    if (get_page_template_slug() == 'page-portfolio-list.php') {
+        $page_template = dirname(__FILE__) . '/inc/page-portfolio-list.php';
+    }
+
     return $page_template;
 }
 
-add_filter( 'theme_page_templates', 'wpse_288589_add_template_to_select', 10, 4 );
-function wpse_288589_add_template_to_select( $post_templates, $wp_theme, $post, $post_type ) {
+add_filter('theme_page_templates', 'wpse_288589_add_template_to_select', 10, 4);
+function wpse_288589_add_template_to_select($post_templates, $wp_theme, $post, $post_type)
+{
 
     // Add custom template named template-custom.php to select dropdown 
     $post_templates['page-preview.php'] = __('Preview Portofolio');
+    $post_templates['page-portfolio-list.php'] = __('Portfolio List');
 
     return $post_templates;
 }
 
-function sweet_portofolio_init() {
+function sweet_portofolio_init()
+{
     if (!session_id()) {
         session_start();
     }
