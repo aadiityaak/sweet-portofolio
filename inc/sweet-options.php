@@ -222,7 +222,7 @@ function portofolio_settings_page_content()
                     <td>
                         <div x-data="portfolioPageGenerator()" class="portfolio-page-container">
                             <div class="row align-middle">
-                                <div class="col-8">
+                                <div class="col-6">
                                     <?php
                                     $selected_page = esc_attr(get_option('portofolio_page'));
                                     wp_dropdown_pages(array(
@@ -234,19 +234,21 @@ function portofolio_settings_page_content()
                                     ));
                                     ?>
                                 </div>
-                                <div class="col-4">
-                                    <button
-                                        @click="generatePortfolioPage()"
-                                        :disabled="generating"
-                                        class="button button-secondary"
-                                        x-text="generating ? 'Generating...' : 'Generate Page'">
-                                    </button>
+                                <div class="col-6">
                                     <button
                                         @click="generatePortfolioPage(true)"
                                         :disabled="generating"
+                                        type="button"
                                         class="button button-primary"
-                                        style="margin-left: 5px;"
-                                        x-text="generating ? 'Generating...' : 'Force Generate'">
+                                        x-text="generating ? 'Generating...' : 'Generate Page'">
+                                    </button>
+                                    <button
+                                        @click="viewPortfolioPage()"
+                                        :disabled="!hasPortfolioPage()"
+                                        type="button"
+                                        class="button button-secondary"
+                                        style="margin-left: 5px;">
+                                        View Page
                                     </button>
                                 </div>
                             </div>
@@ -257,12 +259,8 @@ function portofolio_settings_page_content()
 
                             <div style="margin-top: 10px;">
                                 <span>
-                                    <strong>Generate Page:</strong> Membuat halaman baru jika belum ada.<br>
-                                    <strong>Force Generate:</strong> Menimpa halaman yang sudah ada dengan konten baru.<br><br>
-                                    Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih:<br>
-                                    [sweet-portofolio-jenis-web] Digunakan untuk menampilkan tombol filter berdasarkan jenis web.<br>
-                                    [sweet-portofolio-list default="profil-perusahaan"] Digunakan untuk menampilkan list thumbnail portofolio.<br>
-                                    [sweet-portofolio-list include="1982,1670" title="no"] Digunakan untuk menampilkan portofolio berdasarkan id nya
+                                    <strong>Generate Page:</strong> Membuat halaman portofolio dengan template yang sudah ditentukan.<br><br>
+                                    Halaman akan menggunakan template khusus tanpa perlu menambahkan shortcode secara manual.
                                 </span>
                             </div>
                         </div>
@@ -273,7 +271,7 @@ function portofolio_settings_page_content()
                     <td>
                         <div x-data="previewPageGenerator()" class="preview-page-container">
                             <div class="row align-middle">
-                                <div class="col-8">
+                                <div class="col-6">
                                     <?php
                                     $selected_page = esc_attr(get_option('portofolio_preview_page'));
                                     wp_dropdown_pages(array(
@@ -285,19 +283,21 @@ function portofolio_settings_page_content()
                                     ));
                                     ?>
                                 </div>
-                                <div class="col-4">
-                                    <button
-                                        @click="generatePreviewPage()"
-                                        :disabled="generating"
-                                        class="button button-secondary"
-                                        x-text="generating ? 'Generating...' : 'Generate Page'">
-                                    </button>
+                                <div class="col-6">
                                     <button
                                         @click="generatePreviewPage(true)"
                                         :disabled="generating"
+                                        type="button"
                                         class="button button-primary"
-                                        style="margin-left: 5px;"
-                                        x-text="generating ? 'Generating...' : 'Force Generate'">
+                                        x-text="generating ? 'Generating...' : 'Generate Preview Page'">
+                                    </button>
+                                    <button
+                                        @click="viewPreviewPage()"
+                                        :disabled="!hasPreviewPage()"
+                                        type="button"
+                                        class="button button-secondary"
+                                        style="margin-left: 5px;">
+                                        View Page
                                     </button>
                                 </div>
                             </div>
@@ -308,9 +308,8 @@ function portofolio_settings_page_content()
 
                             <div style="margin-top: 10px;">
                                 <span>
-                                    <strong>Generate Page:</strong> Membuat halaman baru jika belum ada.<br>
-                                    <strong>Force Generate:</strong> Menimpa halaman yang sudah ada dengan konten baru.<br><br>
-                                    Pastikan sudah merubah page template menjadi 'Preview Portofolio' pada page yang dipilih.
+                                    <strong>Generate Preview Page:</strong> Membuat halaman preview portofolio dengan template yang sudah ditentukan.<br><br>
+                                    Halaman akan menggunakan template khusus tanpa perlu menambahkan shortcode secara manual.
                                 </span>
                             </div>
                         </div>
@@ -358,7 +357,7 @@ function portofolio_settings_page_content()
                 message: '',
                 messageType: '',
 
-                async generatePortfolioPage(force = false) {
+                async generatePortfolioPage(force = true) {
                     console.log('generatePortfolioPage called with force:', force);
                     console.log('wpApiSettings.nonce:', wpApiSettings.nonce);
 
@@ -455,6 +454,16 @@ function portofolio_settings_page_content()
                             this.message = '';
                         }, 5000);
                     }
+                },
+
+                viewPortfolioPage() {
+                    // Direct to the portfolio page on frontend
+                    window.open('<?php echo home_url('/portofolio'); ?>', '_blank');
+                },
+
+                hasPortfolioPage() {
+                    const select = document.getElementById('portofolio_page_select');
+                    return select && select.value && select.value !== '-1';
                 }
             }));
 
@@ -464,7 +473,7 @@ function portofolio_settings_page_content()
                 message: '',
                 messageType: '',
 
-                async generatePreviewPage(force = false) {
+                async generatePreviewPage(force = true) {
                     console.log('generatePreviewPage called with force:', force);
                     console.log('wpApiSettings.nonce:', wpApiSettings.nonce);
 
@@ -557,6 +566,16 @@ function portofolio_settings_page_content()
                             this.message = '';
                         }, 5000);
                     }
+                },
+
+                viewPreviewPage() {
+                    // Direct to the preview page on frontend
+                    window.open('<?php echo home_url('/preview-portofolio'); ?>', '_blank');
+                },
+
+                hasPreviewPage() {
+                    const select = document.getElementById('portofolio_preview_page_select');
+                    return select && select.value && select.value !== '-1';
                 }
             }));
         });

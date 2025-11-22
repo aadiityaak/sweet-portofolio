@@ -511,13 +511,13 @@ $categories_data = get_transient('jenis_web_data');
                         <button @click="goToPage(page)" class="pagination-btn" :class="{'active': page === currentPage}" x-text="page"></button>
                     </template>
 
-                    <div class="pagination-info">
-                        <span x-text="`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filteredPortfolios.length)} dari ${filteredPortfolios.length} items`"></span>
-                    </div>
-
                     <button @click="goToPage(currentPage + 1)" class="pagination-btn" :class="{'disabled': currentPage === totalPages}" :disabled="currentPage === totalPages" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </button>
+                </div>
+
+                <div class="pagination-info" x-show="totalPages > 1">
+                    <span x-text="`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filteredPortfolios.length)} dari ${filteredPortfolios.length} items`"></span>
                 </div>
             </div>
         </div>
