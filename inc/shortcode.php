@@ -63,13 +63,14 @@ function sweet_portofolio_jenis_web_shortcode()
 
             <!-- Modal with Alpine.js -->
             <div x-show="modalOpen"
+                x-cloak
                 x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100"
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
-                @click.away="modalOpen = false"
+                @click.self="modalOpen = false"
                 class="frame-modal-portofolio">
                 <div class="content-portofolio">
                     <div class="modal-header">
@@ -82,8 +83,8 @@ function sweet_portofolio_jenis_web_shortcode()
                     </div>
                     <div class="modal-body-portofolio">
                         <ul class="list-group">
-                            <template x-for="(category, index) in categories.filter(cat => '<?php echo implode(',', $portofolio_selection); ?>'.includes(cat.slug))" :key="'category-' + (category.slug || index)">
-                                <a @click="selectCategory(category.slug)" class="list-portofolio">
+                            <template x-for="(category, index) in categories" :key="'category-' + (category.slug || index)">
+                                <a @click="selectCategory(category.slug || category.category)" class="list-portofolio">
                                     <div class="ms-2 me-auto portofolio-text-start">
                                         <div class="fw-bold portofolio-text-start"><b x-text="category.category"></b></div>
                                         <span x-text="'Demo website ' + category.category"></span>

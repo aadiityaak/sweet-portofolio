@@ -21,6 +21,7 @@
         if (categoriesData) {
           try {
             this.categories = JSON.parse(categoriesData.textContent) || [];
+            console.log('Categories data loaded:', this.categories);
           } catch (e) {
             console.error('Error parsing categories data:', e);
             this.categories = [];
@@ -29,6 +30,9 @@
       },
       
       selectCategory(categorySlug) {
+        console.log('Category selected:', categorySlug);
+        console.log('Category object:', this.categories.find(cat => cat.slug === categorySlug));
+        
         this.selectedCategory = categorySlug;
         this.modalOpen = false;
         
@@ -39,7 +43,16 @@
         window.history.pushState({}, '', url);
         
         // Trigger a custom event to notify the portfolio component
+        console.log('Dispatching categoryChanged event');
         window.dispatchEvent(new CustomEvent('categoryChanged', { detail: { category: categorySlug } }));
+        
+        // Also trigger a popstate event to ensure URL changes are detected
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        
+        // Force a page reload to ensure the portfolio grid is updated
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
       }
     }));
     
@@ -72,11 +85,13 @@
         
         // Listen for URL changes
         window.addEventListener('popstate', () => {
+          console.log('popstate event detected');
           this.updateFromURL();
         });
         
         // Listen for category changes from modal
         window.addEventListener('categoryChanged', (event) => {
+          console.log('categoryChanged event received:', event.detail.category);
           this.selectedCategory = event.detail.category;
           this.currentPage = 1; // Reset to page 1
           this.filterPortfolios();
@@ -90,6 +105,14 @@
         const urlParams = new URLSearchParams(window.location.search);
         this.selectedCategory = urlParams.get('jenis_web') || '';
         this.currentPage = parseInt(urlParams.get('halaman')) || 1;
+        console.log('updateFromURL: category =', this.selectedCategory, ', page =', this.currentPage);
+        
+        // Update the select dropdown if it exists
+        const categoryFilter = document.getElementById('category-filter');
+        if (categoryFilter) {
+          categoryFilter.value = this.selectedCategory;
+        }
+        
         this.filterPortfolios();
       },
       
@@ -102,10 +125,24 @@
           this.portfolios = [];
         }
         
+        console.log('Filtering portfolios. Selected category:', this.selectedCategory);
+        console.log('Total portfolios:', this.portfolios.length);
+        console.log('Portfolio selection:', this.portofolioSelection);
+        
+        // Debug: Print first portfolio to understand structure
+        if (this.portfolios.length > 0) {
+          console.log('First portfolio structure:', this.portfolios[0]);
+        }
+        
         if (this.selectedCategory && this.selectedCategory !== '') {
-          this.filteredPortfolios = this.portfolios.filter(portfolio => 
-            portfolio && portfolio.jenis && portfolio.jenis.includes(this.selectedCategory)
-          );
+          this.filteredPortfolios = this.portfolios.filter(portfolio => {
+            console.log('Checking portfolio:', portfolio.title, 'jenis:', portfolio.jenis, 'against category:', this.selectedCategory);
+            return portfolio && portfolio.jenis && (
+              portfolio.jenis === this.selectedCategory || 
+              (Array.isArray(portfolio.jenis) && portfolio.jenis.includes(this.selectedCategory)) ||
+              (typeof portfolio.jenis === 'string' && portfolio.jenis.includes(this.selectedCategory))
+            );
+          });
         } else if (this.portofolioSelection && Array.isArray(this.portofolioSelection) && this.portofolioSelection.length > 0) {
           this.filteredPortfolios = this.portfolios.filter(portfolio => 
             portfolio && portfolio.jenis && this.portofolioSelection.includes(portfolio.jenis)
@@ -113,6 +150,8 @@
         } else {
           this.filteredPortfolios = [...this.portfolios];
         }
+        
+        console.log('Filtered portfolios count:', this.filteredPortfolios.length);
         
         // Update URL when filter changes
         this.updateURL();
