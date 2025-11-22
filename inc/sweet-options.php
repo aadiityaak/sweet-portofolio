@@ -1,4 +1,5 @@
 <?php
+
 /**
  * sweet-portofolio
  *
@@ -9,7 +10,8 @@
  *
  * 
  **/
-function portofolio_whatsapp_settings_page() {
+function portofolio_whatsapp_settings_page()
+{
     add_menu_page(
         'Portofolio Option',
         'Portofolio Option',
@@ -22,29 +24,30 @@ function portofolio_whatsapp_settings_page() {
 }
 add_action('admin_menu', 'portofolio_whatsapp_settings_page');
 
-function portofolio_settings_page_content() {
+function portofolio_settings_page_content()
+{
     $access_key = get_option('portofolio_access_key');
     $portfolioSelection = (array) get_option('portofolio_selection', []);
-    
+
     // Check if access key is valid
     $access_key_valid = true;
     $access_key_message = '';
-    
+
     if (!empty($access_key)) {
         // Clear any existing error data in transients first
         delete_transient('web_data_transient');
-        
+
         // Test the access key with a simple API call
         $test_url = 'https://my.websweetstudio.com/wp-json/wp/v2/portofolio?access_key=' . $access_key . '&per_page=1';
         $test_response = wp_remote_get($test_url);
-        
+
         if (is_wp_error($test_response)) {
             $access_key_valid = false;
             $access_key_message = 'Error connecting to API: ' . $test_response->get_error_message();
         } else {
             $test_body = wp_remote_retrieve_body($test_response);
             $test_data = json_decode($test_body, true);
-            
+
             if (isset($test_data['code']) && $test_data['code'] === 'rest_forbidden') {
                 $access_key_valid = false;
                 $access_key_message = 'Access key is invalid or expired';
@@ -77,50 +80,69 @@ function portofolio_settings_page_content() {
             $data = [];
         }
     }
-    ?>
+?>
     <div class="wrap">
         <h2>Portofolio WhatsApp Settings</h2>
-        
+
         <?php if (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true'): ?>
             <div id="message" class="updated notice is-dismissible">
                 <p>Settings saved successfully.</p>
             </div>
         <?php endif; ?>
-        
+
         <?php if (isset($_GET['cache-cleared']) && $_GET['cache-cleared'] == 'true'): ?>
             <div id="message" class="updated notice is-dismissible">
                 <p>Cache cleared successfully.</p>
             </div>
         <?php endif; ?>
-        
+
         <p>
             <a href="<?php echo admin_url('admin.php?page=portofolio-settings&cache-cleared=true'); ?>" class="button">Clear Cache</a>
             <a href="<?php echo admin_url('admin.php?page=portofolio-settings&refresh-data=true'); ?>" class="button button-primary">Refresh Portfolio Data</a>
+            <a href="<?php echo admin_url('admin.php?page=portofolio-settings&generate-pages=true'); ?>" class="button button-secondary">Generate Pages</a>
             <?php
             if (isset($_GET['cache-cleared']) && $_GET['cache-cleared'] == 'true') {
                 delete_transient('web_data_transient');
                 delete_transient('jenis_web_data');
                 echo '<script>window.location.href = "' . admin_url('admin.php?page=portofolio-settings&cache-cleared-redirect=true') . '";</script>';
             }
-            
+
             if (isset($_GET['refresh-data']) && $_GET['refresh-data'] == 'true') {
                 delete_transient('web_data_transient');
                 delete_transient('jenis_web_data');
                 echo '<script>window.location.href = "' . admin_url('admin.php?page=portofolio-settings&data-refreshed=true') . '";</script>';
             }
-            
+
+            if (isset($_GET['generate-pages']) && $_GET['generate-pages'] == 'true') {
+                portofolio_generate_pages();
+                echo '<script>window.location.href = "' . admin_url('admin.php?page=portofolio-settings&pages-generated=true') . '";</script>';
+            }
+
             if (isset($_GET['cache-cleared-redirect']) && $_GET['cache-cleared-redirect'] == 'true') {
                 echo '<div id="message" class="updated notice is-dismissible"><p>Cache cleared successfully.</p></div>';
             }
-            
+
             if (isset($_GET['data-refreshed']) && $_GET['data-refreshed'] == 'true') {
                 echo '<div id="message" class="updated notice is-dismissible"><p>Portfolio data refreshed successfully.</p></div>';
             }
+
+            if (isset($_GET['pages-generated']) && $_GET['pages-generated'] == 'true') {
+                $messages = get_transient('portofolio_generate_messages');
+                if ($messages && is_array($messages)) {
+                    foreach ($messages as $message) {
+                        echo '<div id="message" class="updated notice is-dismissible"><p>' . esc_html($message) . '</p></div>';
+                    }
+                    delete_transient('portofolio_generate_messages');
+                } else {
+                    echo '<div id="message" class="updated notice is-dismissible"><p>Pages generated successfully. Portofolio and Preview pages have been created with the correct templates.</p></div>';
+                }
+            }
             ?>
         </p>
-        
+
         <form method="post" action="options.php">
-            <?php settings_fields('portofolio-whatsapp-settings-group'); // Prefix added to settings group ?>
+            <?php settings_fields('portofolio-whatsapp-settings-group'); // Prefix added to settings group 
+            ?>
             <?php do_settings_sections('portofolio-whatsapp-settings-group'); ?>
             <table class="form-table">
                 <tr valign="top">
@@ -179,6 +201,8 @@ function portofolio_settings_page_content() {
                         ));
                         ?>
                         <br>
+                        <a href="<?php echo admin_url('admin.php?page=portofolio-settings&generate-pages=true'); ?>" class="button button-secondary">Generate Portofolio Page</a>
+                        <br><br>
                         <span>
                             Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih.<br>
                             [sweet-portofolio-jenis-web] Digunakan untuk menampilkan tombol filter berdasarkan jenis web.<br>
@@ -200,6 +224,8 @@ function portofolio_settings_page_content() {
                         ));
                         ?>
                         <br>
+                        <a href="<?php echo admin_url('admin.php?page=portofolio-settings&generate-pages=true'); ?>" class="button button-secondary">Generate Preview Page</a>
+                        <br><br>
                         <span>
                             Pastikan sudah merubah page template menjadi 'Preview Portofolio' pada page yang dipilih.
                         </span>
@@ -210,7 +236,7 @@ function portofolio_settings_page_content() {
                     <td>
                         <?php foreach ($data as $portfolio) : ?>
                             <label>
-                            <input type="checkbox" name="portofolio_selection[]" value="<?php echo esc_attr($portfolio['slug']); ?>" <?php checked(is_array($portfolioSelection) && in_array($portfolio['slug'], $portfolioSelection)); ?>>
+                                <input type="checkbox" name="portofolio_selection[]" value="<?php echo esc_attr($portfolio['slug']); ?>" <?php checked(is_array($portfolioSelection) && in_array($portfolio['slug'], $portfolioSelection)); ?>>
                                 <?php echo esc_html($portfolio['category']); ?>
                             </label><br>
                         <?php endforeach; ?>
@@ -220,10 +246,11 @@ function portofolio_settings_page_content() {
             <?php submit_button(); ?>
         </form>
     </div>
-    <?php
+<?php
 }
 
-function portofolio_register_whatsapp_settings() {
+function portofolio_register_whatsapp_settings()
+{
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_whatsapp_number'); // Prefix added to setting name
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_access_key', 'portofolio_validate_access_key'); // Prefix added to setting name
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_credit');
@@ -234,15 +261,80 @@ function portofolio_register_whatsapp_settings() {
     register_setting('portofolio-whatsapp-settings-group', 'portofolio_selection');
 }
 
-function portofolio_validate_access_key($input) {
+function portofolio_validate_access_key($input)
+{
     $old_value = get_option('portofolio_access_key');
-    
+
     // If access key has changed, clear transients
     if ($old_value !== $input) {
         delete_transient('web_data_transient');
         delete_transient('jenis_web_data');
     }
-    
+
     return $input;
 }
+
+function portofolio_generate_pages()
+{
+    $messages = array();
+
+    // Check if portfolio page already exists
+    $portfolio_page_id = get_option('portofolio_page');
+    if (!$portfolio_page_id || $portfolio_page_id == '-1' || !get_post($portfolio_page_id)) {
+        // Create portfolio page
+        $portfolio_page = array(
+            'post_title'    => 'Portofolio',
+            'post_content'  => '[sweet-portofolio-jenis-web]' . "\n\n" . '[sweet-portofolio-list default="profil-perusahaan"]',
+            'post_status'   => 'publish',
+            'post_author'   => 1,
+            'post_type'     => 'page',
+            'post_name'     => 'portofolio'
+        );
+
+        $portfolio_page_id = wp_insert_post($portfolio_page);
+
+        if ($portfolio_page_id && !is_wp_error($portfolio_page_id)) {
+            // Save the page ID to options
+            update_option('portofolio_page', $portfolio_page_id);
+            $messages[] = "Portfolio page created successfully.";
+        } else {
+            $messages[] = "Error creating portfolio page.";
+        }
+    } else {
+        $messages[] = "Portfolio page already exists.";
+    }
+
+    // Check if preview page already exists
+    $preview_page_id = get_option('portofolio_preview_page');
+    if (!$preview_page_id || $preview_page_id == '-1' || !get_post($preview_page_id)) {
+        // Create preview page
+        $preview_page = array(
+            'post_title'    => 'Preview Portofolio',
+            'post_content'  => '',
+            'post_status'   => 'publish',
+            'post_author'   => 1,
+            'post_type'     => 'page',
+            'post_name'     => 'preview-portofolio'
+        );
+
+        $preview_page_id = wp_insert_post($preview_page);
+
+        if ($preview_page_id && !is_wp_error($preview_page_id)) {
+            // Save the page ID to options
+            update_option('portofolio_preview_page', $preview_page_id);
+
+            // Set the page template to 'Preview Portofolio'
+            update_post_meta($preview_page_id, '_wp_page_template', 'page-preview.php');
+            $messages[] = "Preview page created successfully with correct template.";
+        } else {
+            $messages[] = "Error creating preview page.";
+        }
+    } else {
+        $messages[] = "Preview page already exists.";
+    }
+
+    // Store messages in transient to display after redirect
+    set_transient('portofolio_generate_messages', $messages, 60);
+}
+
 add_action('admin_init', 'portofolio_register_whatsapp_settings');
