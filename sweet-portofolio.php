@@ -42,6 +42,7 @@ $files = array(
     'inc/shortcode.php',
     'inc/enqueue.php',
     'inc/sweet-options.php',
+    'inc/rest-api.php',
 );
 foreach ($files as $file) {
     require_once plugin_dir_path(__FILE__) . $file;

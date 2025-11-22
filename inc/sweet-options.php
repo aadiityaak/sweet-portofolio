@@ -29,6 +29,35 @@ function portofolio_settings_page_content()
     $access_key = get_option('portofolio_access_key');
     $portfolioSelection = (array) get_option('portofolio_selection', []);
 
+    // Add custom CSS for layout
+    echo '<style>
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        .col-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .col-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .align-middle {
+            align-items: center;
+        }
+        .portfolio-page-container select,
+        .preview-page-container select {
+            width: 100%;
+        }
+    </style>';
+
     // Check if access key is valid
     $access_key_valid = true;
     $access_key_message = '';
@@ -191,44 +220,96 @@ function portofolio_settings_page_content()
                 <tr valign="top">
                     <th scope="row">Portofolio Page</th>
                     <td>
-                        <?php
-                        $selected_page = esc_attr(get_option('portofolio_page'));
-                        wp_dropdown_pages(array(
-                            'name' => 'portofolio_page',
-                            'show_option_none' => '-- Select a Page --',
-                            'option_none_value' => '-1',
-                            'selected' => $selected_page,
-                        ));
-                        ?>
-                        <br>
-                        <a href="<?php echo admin_url('admin.php?page=portofolio-settings&generate-pages=true'); ?>" class="button button-secondary">Generate Portofolio Page</a>
-                        <br><br>
-                        <span>
-                            Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih.<br>
-                            [sweet-portofolio-jenis-web] Digunakan untuk menampilkan tombol filter berdasarkan jenis web.<br>
-                            [sweet-portofolio-list default="profil-perusahaan"] Digunakan untuk menampilkan list thumbnail portofolio.<br>
-                            [sweet-portofolio-list include="1982,1670" title="no"] Digunakan untuk menampilkan portofolio berdasarkan id nya
-                        </span>
+                        <div x-data="portfolioPageGenerator()" class="portfolio-page-container">
+                            <div class="row align-middle">
+                                <div class="col-8">
+                                    <?php
+                                    $selected_page = esc_attr(get_option('portofolio_page'));
+                                    wp_dropdown_pages(array(
+                                        'name' => 'portofolio_page',
+                                        'id' => 'portofolio_page_select',
+                                        'show_option_none' => '-- Select a Page --',
+                                        'option_none_value' => '-1',
+                                        'selected' => $selected_page,
+                                    ));
+                                    ?>
+                                </div>
+                                <div class="col-4">
+                                    <button
+                                        @click="generatePortfolioPage()"
+                                        :disabled="generating"
+                                        class="button button-secondary"
+                                        x-text="generating ? 'Generating...' : 'Generate Page'">
+                                    </button>
+                                    <button
+                                        @click="generatePortfolioPage(true)"
+                                        :disabled="generating"
+                                        class="button button-primary"
+                                        style="margin-left: 5px;"
+                                        x-text="generating ? 'Generating...' : 'Force Generate'">
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div x-show="message" x-transition class="notice" :class="'notice-' + messageType" style="margin-top: 10px;">
+                                <p x-text="message"></p>
+                            </div>
+
+                            <div style="margin-top: 10px;">
+                                <span>
+                                    Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih.<br>
+                                    [sweet-portofolio-jenis-web] Digunakan untuk menampilkan tombol filter berdasarkan jenis web.<br>
+                                    [sweet-portofolio-list default="profil-perusahaan"] Digunakan untuk menampilkan list thumbnail portofolio.<br>
+                                    [sweet-portofolio-list include="1982,1670" title="no"] Digunakan untuk menampilkan portofolio berdasarkan id nya
+                                </span>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 <tr valign="top">
                     <th scope="row">Preview Page</th>
                     <td>
-                        <?php
-                        $selected_page = esc_attr(get_option('portofolio_preview_page'));
-                        wp_dropdown_pages(array(
-                            'name' => 'portofolio_preview_page',
-                            'show_option_none' => '-- Select a Page --',
-                            'option_none_value' => '-1',
-                            'selected' => $selected_page,
-                        ));
-                        ?>
-                        <br>
-                        <a href="<?php echo admin_url('admin.php?page=portofolio-settings&generate-pages=true'); ?>" class="button button-secondary">Generate Preview Page</a>
-                        <br><br>
-                        <span>
-                            Pastikan sudah merubah page template menjadi 'Preview Portofolio' pada page yang dipilih.
-                        </span>
+                        <div x-data="previewPageGenerator()" class="preview-page-container">
+                            <div class="row align-middle">
+                                <div class="col-8">
+                                    <?php
+                                    $selected_page = esc_attr(get_option('portofolio_preview_page'));
+                                    wp_dropdown_pages(array(
+                                        'name' => 'portofolio_preview_page',
+                                        'id' => 'portofolio_preview_page_select',
+                                        'show_option_none' => '-- Select a Page --',
+                                        'option_none_value' => '-1',
+                                        'selected' => $selected_page,
+                                    ));
+                                    ?>
+                                </div>
+                                <div class="col-4">
+                                    <button
+                                        @click="generatePreviewPage()"
+                                        :disabled="generating"
+                                        class="button button-secondary"
+                                        x-text="generating ? 'Generating...' : 'Generate Page'">
+                                    </button>
+                                    <button
+                                        @click="generatePreviewPage(true)"
+                                        :disabled="generating"
+                                        class="button button-primary"
+                                        style="margin-left: 5px;"
+                                        x-text="generating ? 'Generating...' : 'Force Generate'">
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div x-show="message" x-transition class="notice" :class="'notice-' + messageType" style="margin-top: 10px;">
+                                <p x-text="message"></p>
+                            </div>
+
+                            <div style="margin-top: 10px;">
+                                <span>
+                                    Pastikan sudah merubah page template menjadi 'Preview Portofolio' pada page yang dipilih.
+                                </span>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 <tr valign="top">
@@ -246,6 +327,230 @@ function portofolio_settings_page_content()
             <?php submit_button(); ?>
         </form>
     </div>
+
+    <script>
+        // Make sure Alpine.js is loaded before initializing components
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded');
+            console.log('wpApiSettings:', window.wpApiSettings);
+
+            // Check if Alpine.js is loaded
+            if (typeof Alpine === 'undefined') {
+                console.error('Alpine.js is not loaded');
+                return;
+            }
+
+            console.log('Alpine.js is loaded');
+            // Initialize Alpine.js components
+            Alpine.start();
+        });
+
+        document.addEventListener('alpine:init', () => {
+            console.log('Alpine.js initializing');
+
+            // Function to generate portfolio page
+            Alpine.data('portfolioPageGenerator', () => ({
+                generating: false,
+                message: '',
+                messageType: '',
+
+                async generatePortfolioPage(force = false) {
+                    console.log('generatePortfolioPage called with force:', force);
+                    console.log('wpApiSettings.nonce:', wpApiSettings.nonce);
+
+                    this.generating = true;
+                    this.message = '';
+
+                    try {
+                        const apiUrl = '<?php echo rest_url('sweet-portofolio/v1/generate-portfolio-page'); ?>';
+                        console.log('Making request to:', apiUrl);
+
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': wpApiSettings.nonce
+                            },
+                            body: JSON.stringify({
+                                force: force
+                            })
+                        });
+
+                        console.log('Response status:', response.status);
+                        console.log('Response ok:', response.ok);
+
+                        const data = await response.json();
+                        console.log('Response data:', data);
+
+                        if (response.ok) {
+                            this.message = data.message || 'Portfolio page created successfully!';
+                            this.messageType = 'success';
+                            console.log('Success message:', this.message);
+
+                            // Update the select dropdown
+                            if (data.page_id) {
+                                console.log('Updating select dropdown with page_id:', data.page_id);
+                                const select = document.getElementById('portofolio_page_select');
+                                if (select) {
+                                    console.log('Select element found with', select.options.length, 'options');
+                                    // Log all current options
+                                    for (let i = 0; i < select.options.length; i++) {
+                                        console.log('Option', i, ': value=', select.options[i].value, ', text=', select.options[i].text);
+                                    }
+
+                                    // Add new option if not exists
+                                    let optionExists = false;
+                                    for (let i = 0; i < select.options.length; i++) {
+                                        if (select.options[i].value == data.page_id) {
+                                            optionExists = true;
+                                            select.selectedIndex = i;
+                                            console.log('Found existing option at index', i);
+                                            break;
+                                        }
+                                    }
+
+                                    if (!optionExists) {
+                                        console.log('Adding new option to select');
+                                        const newOption = document.createElement('option');
+                                        newOption.value = data.page_id;
+                                        newOption.text = data.page_title || 'Portofolio';
+                                        newOption.selected = true;
+                                        select.appendChild(newOption);
+                                        console.log('New option added and selected');
+
+                                        // Trigger change event to notify WordPress
+                                        const changeEvent = new Event('change', {
+                                            bubbles: true
+                                        });
+                                        select.dispatchEvent(changeEvent);
+                                        console.log('Change event dispatched');
+                                    }
+                                } else {
+                                    console.error('Select element not found');
+                                }
+                            }
+                        } else {
+                            this.message = data.message || 'Error creating portfolio page.';
+                            this.messageType = 'error';
+                            console.error('Error message:', this.message);
+                        }
+                    } catch (error) {
+                        console.error('Network error:', error);
+                        this.message = 'Network error: ' + error.message;
+                        this.messageType = 'error';
+                    } finally {
+                        this.generating = false;
+                        console.log('Generation process completed');
+
+                        // Clear message after 5 seconds
+                        setTimeout(() => {
+                            this.message = '';
+                        }, 5000);
+                    }
+                }
+            }));
+
+            // Function to generate preview page
+            Alpine.data('previewPageGenerator', () => ({
+                generating: false,
+                message: '',
+                messageType: '',
+
+                async generatePreviewPage(force = false) {
+                    console.log('generatePreviewPage called with force:', force);
+                    console.log('wpApiSettings.nonce:', wpApiSettings.nonce);
+
+                    this.generating = true;
+                    this.message = '';
+
+                    try {
+                        const apiUrl = '<?php echo rest_url('sweet-portofolio/v1/generate-preview-page'); ?>';
+                        console.log('Making request to:', apiUrl);
+
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-WP-Nonce': wpApiSettings.nonce
+                            },
+                            body: JSON.stringify({
+                                force: force
+                            })
+                        });
+
+                        console.log('Response status:', response.status);
+                        console.log('Response ok:', response.ok);
+
+                        const data = await response.json();
+                        console.log('Response data:', data);
+
+                        if (response.ok) {
+                            this.message = data.message || 'Preview page created successfully!';
+                            this.messageType = 'success';
+
+                            // Update the select dropdown
+                            if (data.page_id) {
+                                console.log('Updating preview select dropdown with page_id:', data.page_id);
+                                const select = document.getElementById('portofolio_preview_page_select');
+                                if (select) {
+                                    console.log('Preview select element found with', select.options.length, 'options');
+                                    // Log all current options
+                                    for (let i = 0; i < select.options.length; i++) {
+                                        console.log('Preview Option', i, ': value=', select.options[i].value, ', text=', select.options[i].text);
+                                    }
+
+                                    // Add new option if not exists
+                                    let optionExists = false;
+                                    for (let i = 0; i < select.options.length; i++) {
+                                        if (select.options[i].value == data.page_id) {
+                                            optionExists = true;
+                                            select.selectedIndex = i;
+                                            console.log('Found existing preview option at index', i);
+                                            break;
+                                        }
+                                    }
+
+                                    if (!optionExists) {
+                                        console.log('Adding new preview option to select');
+                                        const newOption = document.createElement('option');
+                                        newOption.value = data.page_id;
+                                        newOption.text = data.page_title || 'Preview Portofolio';
+                                        newOption.selected = true;
+                                        select.appendChild(newOption);
+                                        console.log('New preview option added and selected');
+
+                                        // Trigger change event to notify WordPress
+                                        const changeEvent = new Event('change', {
+                                            bubbles: true
+                                        });
+                                        select.dispatchEvent(changeEvent);
+                                        console.log('Preview change event dispatched');
+                                    }
+                                } else {
+                                    console.error('Preview select element not found');
+                                }
+                            }
+                        } else {
+                            this.message = data.message || 'Error creating preview page.';
+                            this.messageType = 'error';
+                        }
+                    } catch (error) {
+                        this.message = 'Network error: ' + error.message;
+                        this.messageType = 'error';
+                    } finally {
+                        this.generating = false;
+
+                        // Clear message after 5 seconds
+                        setTimeout(() => {
+                            this.message = '';
+                        }, 5000);
+                    }
+                }
+            }));
+        });
+
+        // No need to manually initialize components as they're already initialized by Alpine.js
+    </script>
 <?php
 }
 
@@ -336,5 +641,7 @@ function portofolio_generate_pages()
     // Store messages in transient to display after redirect
     set_transient('portofolio_generate_messages', $messages, 60);
 }
+
+
 
 add_action('admin_init', 'portofolio_register_whatsapp_settings');
