@@ -54,8 +54,8 @@ function sweet_portofolio_jenis_web_shortcode()
         // Alpine.js modal component
 ?>
         <div x-data="categoryModal">
-            <button @click.prevent="modalOpen = true" class="btn-modal-portofolio">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-diagram-3" viewBox="0 0 16 16">
+            <button @click.prevent="modalOpen = true" class="btn-modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z" />
                 </svg>
                 Pilih Kategori
@@ -71,28 +71,28 @@ function sweet_portofolio_jenis_web_shortcode()
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
                 @click.self="modalOpen = false"
-                class="frame-modal-portofolio">
-                <div class="content-portofolio">
+                class="modal-overlay">
+                <div class="modal-content">
                     <div class="modal-header">
-                        <b>Pilih Kategori</b>
-                        <button @click.stop="modalOpen = false" class="close-modal-portofolio">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <h3>Pilih Kategori</h3>
+                        <button @click.stop="modalOpen = false" class="modal-close">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z" />
                             </svg>
                         </button>
                     </div>
-                    <div class="modal-body-portofolio">
-                        <ul class="list-group">
+                    <div class="modal-body">
+                        <div class="category-list">
                             <template x-for="(category, index) in categories" :key="'category-' + (category.slug || index)">
-                                <a @click.stop="selectCategory(category.slug || category.category)" class="list-portofolio">
-                                    <div class="ms-2 me-auto portofolio-text-start">
-                                        <div class="fw-bold portofolio-text-start"><b x-text="category.category"></b></div>
-                                        <span x-text="'Demo website ' + category.category"></span>
+                                <a @click.stop="selectCategory(category.slug || category.category)" class="category-item">
+                                    <div class="category-info">
+                                        <div class="category-name" x-text="category.category"></div>
+                                        <div class="category-desc" x-text="'Demo website ' + category.category"></div>
                                     </div>
-                                    <span class="badge-portofolio" x-text="category.count"></span>
+                                    <span class="category-count" x-text="category.count"></span>
                                 </a>
                             </template>
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -243,37 +243,31 @@ function portofolio_custom_masonry_shortcode($atts)
         ?>
     )">
         <!-- Filter Form with Alpine.js -->
-        <div class="filter-section mb-3">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="category-filter" class="form-label">Filter by Category:</label>
-                        <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="form-select">
-                            <option value="">All Categories</option>
-                            <?php
-                            // Get categories for filter dropdown
-                            $categories_data = get_transient('jenis_web_data');
-                            if (is_array($categories_data) && !empty($portofolio_selection)) {
-                                foreach ($categories_data as $category) {
-                                    if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
-                                        echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
-                                    }
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="filter-select">
+                        <option value="">All Categories</option>
+                        <?php
+                        // Get categories for filter dropdown
+                        $categories_data = get_transient('jenis_web_data');
+                        if (is_array($categories_data) && !empty($portofolio_selection)) {
+                            foreach ($categories_data as $category) {
+                                if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
+                                    echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
                                 }
                             }
-                            ?>
-                        </select>
-                    </div>
+                        }
+                        ?>
+                    </select>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Items per page:</label>
-                        <select x-model="itemsPerPage" @change="filterPortfolios()" class="form-select">
-                            <option value="6">6</option>
-                            <option value="12">12</option>
-                            <option value="24">24</option>
-                            <option value="48">48</option>
-                        </select>
-                    </div>
+                <div class="filter-group">
+                    <select x-model="itemsPerPage" @change="filterPortfolios()" class="filter-select">
+                        <option value="6">6 items</option>
+                        <option value="12">12 items</option>
+                        <option value="24">24 items</option>
+                        <option value="48">48 items</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -282,22 +276,23 @@ function portofolio_custom_masonry_shortcode($atts)
             <template x-for="(item, index) in paginatedPortfolios" :key="'portfolio-' + (item.id || index)">
                 <div class="col-portofolio">
                     <div class="card-portofolio">
-                        <div class="position-relative">
-                            <img :src="getImageUrl(item)" :alt="item.title" class="card-img-top" @error="$event.target.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'">
-                            <span x-show="portofolioCredit" class="portofolio-credit" x-text="portofolioCredit"></span>
+                        <div class="card-image">
+                            <img :src="getImageUrl(item)" :alt="item.title" @error="$event.target.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'">
+                            <span x-show="portofolioCredit" class="card-credit" x-text="portofolioCredit"></span>
                         </div>
-                        <div class="card-body">
-                            <h5 x-show="showTitle !== 'no'" class="portofolio-title" x-text="item.title"></h5>
-                            <div class="group-btn-portfolio" role="group" aria-label="Basic example">
-                                <a :href="getPreviewUrl(item)" class="btn-preview-portfolio" target="_blank">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                        <div class="card-content">
+                            <h3 x-show="showTitle !== 'no'" class="card-title" x-text="item.title"></h3>
+                            <p x-show="item.excerpt" class="card-excerpt" x-text="item.excerpt"></p>
+                            <div class="card-actions">
+                                <a :href="getPreviewUrl(item)" class="btn-preview" target="_blank">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
                                         <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7" />
                                     </svg>
                                     Preview
                                 </a>
-                                <a x-show="whatsappNumber" :href="getWhatsAppUrl(item)" class="btn-whatsapp-portfolio" target="_blank">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                                <a x-show="whatsappNumber" :href="getWhatsAppUrl(item)" class="btn-whatsapp" target="_blank">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
                                     </svg> Order
                                 </a>
@@ -309,15 +304,19 @@ function portofolio_custom_masonry_shortcode($atts)
         </div>
 
         <!-- Pagination with Alpine.js -->
-        <nav x-show="totalPages > 1" aria-label="Page navigation" class="pt-3">
-            <ul class="pagination justify-content-center">
-                <template x-for="page in totalPages" :key="'page-' + page">
-                    <li :class="{'page-item': true, 'active': page === currentPage}">
-                        <a @click="goToPage(page)" class="page-link" href="javascript:void(0)" x-text="page"></a>
-                    </li>
-                </template>
-            </ul>
-        </nav>
+        <div x-show="totalPages > 1" class="pagination">
+            <button @click="goToPage(currentPage - 1)" class="pagination-btn" :class="{'disabled': currentPage === 1}" :disabled="currentPage === 1" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </button>
+
+            <template x-for="page in getVisiblePages()" :key="'page-' + page">
+                <button @click="goToPage(page)" class="pagination-btn" :class="{'active': page === currentPage}" x-text="page"></button>
+            </template>
+
+            <button @click="goToPage(currentPage + 1)" class="pagination-btn" :class="{'disabled': currentPage === totalPages}" :disabled="currentPage === totalPages" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </button>
+        </div>
     </div>
 <?php
     return ob_get_clean();
