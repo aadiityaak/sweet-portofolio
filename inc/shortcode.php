@@ -193,7 +193,16 @@ function portofolio_custom_masonry_shortcode($atts)
         '<?php echo !empty($preview_page) ? get_the_permalink($preview_page) : ''; ?>',
         '<?php echo $whatsapp_number; ?>',
         '<?php echo $portofolio_credit; ?>',
-        <?php echo json_encode($portofolio_selection); ?>
+        <?php
+        // Ensure portofolio_selection is a valid array
+        if (!is_array($portofolio_selection)) {
+            $portofolio_selection = array();
+        }
+        // Output the array as a JavaScript array literal
+        echo '[' . implode(',', array_map(function ($item) {
+            return "'" . esc_js($item) . "'";
+        }, $portofolio_selection)) . ']';
+        ?>
     )">
         <!-- Filter Form with Alpine.js -->
         <div class="filter-section mb-3">
@@ -236,7 +245,7 @@ function portofolio_custom_masonry_shortcode($atts)
                 <div class="col-portofolio">
                     <div class="card-portofolio">
                         <div class="position-relative">
-                            <img :src="getImageUrl(item)" :alt="item.title" class="card-img-top">
+                            <img :src="getImageUrl(item)" :alt="item.title" class="card-img-top" @error="$event.target.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'">
                             <span x-show="portofolioCredit" class="portofolio-credit" x-text="portofolioCredit"></span>
                         </div>
                         <div class="card-body">

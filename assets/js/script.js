@@ -211,7 +211,53 @@
       
       getImageUrl(portfolio) {
         if (!portfolio) return '';
-        return this.styleThumbnail === 'thumbnail' ? (portfolio.thumbnail_url || '') : (portfolio.screenshot || '');
+        
+        // Debug logging
+        console.log('Getting image URL for portfolio:', portfolio);
+        console.log('Style thumbnail setting:', this.styleThumbnail);
+        
+        // Helper function to clean URL from backticks
+        const cleanUrl = (url) => {
+          if (!url || typeof url !== 'string') return '';
+          // Remove backticks from the beginning and end of the URL
+          return url.replace(/^`|`$/g, '').trim();
+        };
+        
+        // Try to get image from _embedded data (WordPress REST API with _embed parameter)
+        let imageUrl = '';
+        
+        if (portfolio._embedded && portfolio._embedded['wp:featuredmedia'] && portfolio._embedded['wp:featuredmedia'][0]) {
+          const featuredMedia = portfolio._embedded['wp:featuredmedia'][0];
+          
+          // Get appropriate image size based on styleThumbnail setting
+          if (this.styleThumbnail === 'thumbnail' && featuredMedia.media_details && featuredMedia.media_details.sizes && featuredMedia.media_details.sizes.thumbnail) {
+            imageUrl = cleanUrl(featuredMedia.media_details.sizes.thumbnail.source_url);
+          } else if (featuredMedia.media_details && featuredMedia.media_details.sizes && featuredMedia.media_details.sizes.medium) {
+            imageUrl = cleanUrl(featuredMedia.media_details.sizes.medium.source_url);
+          } else if (featuredMedia.media_details && featuredMedia.media_details.sizes && featuredMedia.media_details.sizes.full) {
+            imageUrl = cleanUrl(featuredMedia.media_details.sizes.full.source_url);
+          } else {
+            // Fallback to source_url if no specific size is available
+            imageUrl = cleanUrl(featuredMedia.source_url);
+          }
+        }
+        
+        // If no image found in _embedded, try other possible fields
+        if (!imageUrl) {
+          if (this.styleThumbnail === 'thumbnail') {
+            imageUrl = cleanUrl(portfolio.thumbnail_url) || cleanUrl(portfolio.thumbnail) || cleanUrl(portfolio.image) || cleanUrl(portfolio.featured_image);
+          } else {
+            imageUrl = cleanUrl(portfolio.screenshot) || cleanUrl(portfolio.full_image) || cleanUrl(portfolio.image) || cleanUrl(portfolio.featured_image);
+          }
+          
+          // Final fallback to any image field
+          if (!imageUrl) {
+            imageUrl = cleanUrl(portfolio.image) || cleanUrl(portfolio.featured_image) || cleanUrl(portfolio.thumbnail) || cleanUrl(portfolio.screenshot) || cleanUrl(portfolio.thumbnail_url);
+          }
+        }
+        
+        console.log('Final image URL:', imageUrl);
+        return imageUrl;
       }
     }));
   });
