@@ -228,17 +228,47 @@
       function openModal(event) {
         event.preventDefault();
         console.log('Opening modal via fallback');
-        modal.style.display = "block";
         
-        // Try to set modalOpen to true if Alpine is available
-        if (window.Alpine && window.Alpine.$store) {
-          // This is a fallback in case Alpine.js is not fully initialized
+        // Force display with !important to override any CSS
+        modal.style.setProperty('display', 'block', 'important');
+        modal.style.setProperty('opacity', '1', 'important');
+        modal.style.setProperty('visibility', 'visible', 'important');
+        modal.style.setProperty('z-index', '9999', 'important');
+        
+        // Add a custom class to ensure modal is visible
+        modal.classList.add('modal-force-show');
+        
+        // Try multiple approaches to set modalOpen to true if Alpine is available
+        if (window.Alpine) {
+          // Try to access Alpine data directly
           setTimeout(() => {
-            const modalComponent = Alpine.$data(modal.parentElement);
-            if (modalComponent) {
-              modalComponent.modalOpen = true;
+            try {
+              // Method 1: Try to find the component by x-data attribute (most reliable)
+              const alpineComponent = modal.closest('[x-data]');
+              if (alpineComponent) {
+                const componentData = Alpine.$data(alpineComponent);
+                if (componentData && componentData.modalOpen !== undefined) {
+                  componentData.modalOpen = true;
+                  console.log('Set modalOpen via closest x-data element');
+                }
+              }
+              
+              // Method 2: Try to get Alpine data from parent element
+              const modalComponent = Alpine.$data(modal.parentElement);
+              if (modalComponent && modalComponent.modalOpen !== undefined) {
+                modalComponent.modalOpen = true;
+                console.log('Set modalOpen via Alpine.$data');
+              }
+              
+              // Method 3: Try to evaluate Alpine expression
+              if (Alpine.evaluate) {
+                Alpine.evaluate(modal, 'modalOpen = true');
+                console.log('Set modalOpen via Alpine.evaluate');
+              }
+            } catch (e) {
+              console.error('Error setting modalOpen via Alpine:', e);
             }
-          }, 50);
+          }, 100);
         }
       }
 
@@ -247,16 +277,45 @@
         event.preventDefault();
         event.stopPropagation();
         console.log('Closing modal via fallback');
-        modal.style.display = "none";
         
-        // Try to set modalOpen to false if Alpine is available
-        if (window.Alpine && window.Alpine.$store) {
+        // Force hide with !important to override any CSS
+        modal.style.setProperty('display', 'none', 'important');
+        modal.style.setProperty('opacity', '0', 'important');
+        modal.style.setProperty('visibility', 'hidden', 'important');
+        
+        // Remove the custom class
+        modal.classList.remove('modal-force-show');
+        
+        // Try multiple approaches to set modalOpen to false if Alpine is available
+        if (window.Alpine) {
           setTimeout(() => {
-            const modalComponent = Alpine.$data(modal.parentElement);
-            if (modalComponent) {
-              modalComponent.modalOpen = false;
+            try {
+              // Method 1: Try to find the component by x-data attribute (most reliable)
+              const alpineComponent = modal.closest('[x-data]');
+              if (alpineComponent) {
+                const componentData = Alpine.$data(alpineComponent);
+                if (componentData && componentData.modalOpen !== undefined) {
+                  componentData.modalOpen = false;
+                  console.log('Set modalOpen to false via closest x-data element');
+                }
+              }
+              
+              // Method 2: Try to get Alpine data from parent element
+              const modalComponent = Alpine.$data(modal.parentElement);
+              if (modalComponent && modalComponent.modalOpen !== undefined) {
+                modalComponent.modalOpen = false;
+                console.log('Set modalOpen to false via Alpine.$data');
+              }
+              
+              // Method 3: Try to evaluate Alpine expression
+              if (Alpine.evaluate) {
+                Alpine.evaluate(modal, 'modalOpen = false');
+                console.log('Set modalOpen to false via Alpine.evaluate');
+              }
+            } catch (e) {
+              console.error('Error setting modalOpen to false via Alpine:', e);
             }
-          }, 50);
+          }, 100);
         }
       }
 
@@ -319,6 +378,83 @@
         if (event.target === modal) {
           closeModal();
         }
+      });
+    }
+    
+    // Additional fallback: Add event listener after Alpine.js is loaded
+    if (window.Alpine) {
+      // If Alpine is already loaded, add the listener immediately
+      setTimeout(() => {
+        const trigger = document.querySelector(".btn-modal-portofolio");
+        if (trigger) {
+          console.log('Adding additional click listener for Alpine.js compatibility');
+          trigger.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Modal button clicked via additional listener');
+            
+            const modal = document.querySelector(".frame-modal-portofolio");
+            if (modal) {
+              modal.style.setProperty('display', 'block', 'important');
+              modal.style.setProperty('opacity', '1', 'important');
+              modal.style.setProperty('visibility', 'visible', 'important');
+              modal.style.setProperty('z-index', '9999', 'important');
+              modal.classList.add('modal-force-show');
+              
+              // Try to set Alpine state
+              const alpineComponent = modal.closest('[x-data]');
+              if (alpineComponent && window.Alpine) {
+                try {
+                  const componentData = Alpine.$data(alpineComponent);
+                  if (componentData && componentData.modalOpen !== undefined) {
+                    componentData.modalOpen = true;
+                    console.log('Set modalOpen via additional listener');
+                  }
+                } catch (e) {
+                  console.error('Error setting modalOpen via additional listener:', e);
+                }
+              }
+            }
+          });
+        }
+      }, 500);
+    } else {
+      // If Alpine is not loaded yet, wait for it
+      document.addEventListener('alpine:init', function() {
+        setTimeout(() => {
+          const trigger = document.querySelector(".btn-modal-portofolio");
+          if (trigger) {
+            console.log('Adding additional click listener after Alpine.js init');
+            trigger.addEventListener("click", function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Modal button clicked via post-init listener');
+              
+              const modal = document.querySelector(".frame-modal-portofolio");
+              if (modal) {
+                modal.style.setProperty('display', 'block', 'important');
+                modal.style.setProperty('opacity', '1', 'important');
+                modal.style.setProperty('visibility', 'visible', 'important');
+                modal.style.setProperty('z-index', '9999', 'important');
+                modal.classList.add('modal-force-show');
+                
+                // Try to set Alpine state
+                const alpineComponent = modal.closest('[x-data]');
+                if (alpineComponent && window.Alpine) {
+                  try {
+                    const componentData = Alpine.$data(alpineComponent);
+                    if (componentData && componentData.modalOpen !== undefined) {
+                      componentData.modalOpen = true;
+                      console.log('Set modalOpen via post-init listener');
+                    }
+                  } catch (e) {
+                    console.error('Error setting modalOpen via post-init listener:', e);
+                  }
+                }
+              }
+            });
+          }
+        }, 500);
       });
     }
   });

@@ -38,6 +38,14 @@
   display: none !important;
 }
 
+/* Force show modal class for fallback */
+.modal-force-show {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 9999 !important;
+}
+
 /* Colors */
 .frame-modal-portofolio a {
   color: #333 !important;
