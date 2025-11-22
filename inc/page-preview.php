@@ -1,7 +1,7 @@
 <?php
 
 /**
- * sweet-portofolio
+ * Template Name: Preview
  *
  * @package       SWEETPORTOFOLIO
  * @author        Aditya K

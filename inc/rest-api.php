@@ -61,8 +61,9 @@ function sweet_portofolio_generate_portfolio_page($request) {
     error_log('REST API: Request headers: ' . print_r($headers, true));
     
     // Get force parameter from request
-    $force = $request->get_param('force') === 'true';
-    error_log('REST API: force parameter = ' . ($force ? 'true' : 'false'));
+    $force_param = $request->get_param('force');
+    $force = ($force_param === 'true' || $force_param === true);
+    error_log('REST API: force parameter = ' . ($force ? 'true' : 'false') . ' (raw: ' . print_r($force_param, true) . ')');
     
     // Check if portfolio page already exists
     $portfolio_page_id = get_option('portofolio_page');
@@ -76,11 +77,12 @@ function sweet_portofolio_generate_portfolio_page($request) {
     // Create portfolio page
     $portfolio_page = array(
         'post_title'    => 'Portofolio',
-        'post_content'  => '[sweet-portofolio-jenis-web]' . "\n\n" . '[sweet-portofolio-list default="profil-perusahaan"]',
+        'post_content'  => '', // Content will be loaded from template file
         'post_status'   => 'publish',
         'post_author'   => get_current_user_id(),
         'post_type'     => 'page',
-        'post_name'     => 'portofolio'
+        'post_name'     => 'portofolio',
+        'page_template' => 'page-portfolio-list.php' // Set template to portfolio list
     );
     
     $new_portfolio_page_id = wp_insert_post($portfolio_page);
@@ -119,8 +121,9 @@ function sweet_portofolio_generate_preview_page($request) {
     error_log('REST API: Request headers: ' . print_r($headers, true));
     
     // Get force parameter from request
-    $force = $request->get_param('force') === 'true';
-    error_log('REST API: force parameter = ' . ($force ? 'true' : 'false'));
+    $force_param = $request->get_param('force');
+    $force = ($force_param === 'true' || $force_param === true);
+    error_log('REST API: force parameter = ' . ($force ? 'true' : 'false') . ' (raw: ' . print_r($force_param, true) . ')');
     
     // Check if preview page already exists
     $preview_page_id = get_option('portofolio_preview_page');
@@ -134,25 +137,25 @@ function sweet_portofolio_generate_preview_page($request) {
     // Create preview page
     $preview_page = array(
         'post_title'    => 'Preview Portofolio',
-        'post_content'  => '',
+        'post_content'  => '', // Content will be loaded from template file
         'post_status'   => 'publish',
         'post_author'   => get_current_user_id(),
         'post_type'     => 'page',
-        'post_name'     => 'preview-portofolio'
+        'post_name'     => 'preview-portofolio',
+        'page_template' => 'page-preview.php' // Set template to preview page
     );
     
     $new_preview_page_id = wp_insert_post($preview_page);
+    error_log('REST API: wp_insert_post result = ' . $new_preview_page_id);
     
     if ($new_preview_page_id && !is_wp_error($new_preview_page_id)) {
         // Save the page ID to options
         update_option('portofolio_preview_page', $new_preview_page_id);
-        
-        // Set the page template to 'Preview Portofolio'
-        update_post_meta($new_preview_page_id, '_wp_page_template', 'page-preview.php');
+        error_log('REST API: Preview page created successfully with ID = ' . $new_preview_page_id);
         
         $response_data = array(
             'success' => true,
-            'message' => 'Preview page created successfully with correct template.',
+            'message' => 'Preview page created successfully.',
             'page_id' => $new_preview_page_id,
             'page_title' => get_the_title($new_preview_page_id),
             'edit_url' => get_edit_post_link($new_preview_page_id),
@@ -161,6 +164,7 @@ function sweet_portofolio_generate_preview_page($request) {
         
         return new WP_REST_Response($response_data, 200);
     } else {
+        error_log('REST API: Failed to create preview page');
         return new WP_Error('creation_failed', 'Failed to create preview page.', array('status' => 500));
     }
 }

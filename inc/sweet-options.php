@@ -257,7 +257,9 @@ function portofolio_settings_page_content()
 
                             <div style="margin-top: 10px;">
                                 <span>
-                                    Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih.<br>
+                                    <strong>Generate Page:</strong> Membuat halaman baru jika belum ada.<br>
+                                    <strong>Force Generate:</strong> Menimpa halaman yang sudah ada dengan konten baru.<br><br>
+                                    Pastikan sudah memasukkan shortcode di bawah ini pada page yang dipilih:<br>
                                     [sweet-portofolio-jenis-web] Digunakan untuk menampilkan tombol filter berdasarkan jenis web.<br>
                                     [sweet-portofolio-list default="profil-perusahaan"] Digunakan untuk menampilkan list thumbnail portofolio.<br>
                                     [sweet-portofolio-list include="1982,1670" title="no"] Digunakan untuk menampilkan portofolio berdasarkan id nya
@@ -306,6 +308,8 @@ function portofolio_settings_page_content()
 
                             <div style="margin-top: 10px;">
                                 <span>
+                                    <strong>Generate Page:</strong> Membuat halaman baru jika belum ada.<br>
+                                    <strong>Force Generate:</strong> Menimpa halaman yang sudah ada dengan konten baru.<br><br>
                                     Pastikan sudah merubah page template menjadi 'Preview Portofolio' pada page yang dipilih.
                                 </span>
                             </div>
@@ -341,8 +345,8 @@ function portofolio_settings_page_content()
             }
 
             console.log('Alpine.js is loaded');
-            // Initialize Alpine.js components
-            Alpine.start();
+            // Don't call Alpine.start() here as it's already initialized by the CDN script
+            // Alpine.start(); // This line is causing the warning
         });
 
         document.addEventListener('alpine:init', () => {
@@ -430,7 +434,11 @@ function portofolio_settings_page_content()
                                 }
                             }
                         } else {
-                            this.message = data.message || 'Error creating portfolio page.';
+                            if (data.code === 'page_exists') {
+                                this.message = data.message + ' Use the "Force Generate" button to overwrite the existing page.';
+                            } else {
+                                this.message = data.message || 'Error creating portfolio page.';
+                            }
                             this.messageType = 'error';
                             console.error('Error message:', this.message);
                         }
@@ -531,7 +539,11 @@ function portofolio_settings_page_content()
                                 }
                             }
                         } else {
-                            this.message = data.message || 'Error creating preview page.';
+                            if (data.code === 'page_exists') {
+                                this.message = data.message + ' Use the "Force Generate" button to overwrite the existing page.';
+                            } else {
+                                this.message = data.message || 'Error creating preview page.';
+                            }
                             this.messageType = 'error';
                         }
                     } catch (error) {
