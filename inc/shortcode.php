@@ -142,6 +142,19 @@ function portofolio_custom_masonry_shortcode($atts)
     $transient_key = 'web_data_transient';
     $data = get_transient($transient_key);
 
+    // Check if access_key is set
+    if (empty($access_key)) {
+        echo '<div class="alert alert-warning">Access Key is not set. Please configure the access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
+        return;
+    }
+
+    // Check if transient contains error data
+    if ($data !== false && isset($data['code']) && $data['code'] === 'rest_forbidden') {
+        // Clear the transient with error data
+        delete_transient($transient_key);
+        $data = false;
+    }
+
     if (false === $data) {
         $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/portofolio?access_key=' . $access_key;
 
@@ -152,14 +165,39 @@ function portofolio_custom_masonry_shortcode($atts)
         $response = wp_remote_get($api_url);
 
         if (is_wp_error($response)) {
-            return 'Error fetching data from API.';
+            echo '<div class="alert alert-danger">Error fetching data from API: ' . esc_html($response->get_error_message()) . '</div>';
+            return;
         }
 
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
 
-        // Simpan data dalam transient selama 12 jam
-        set_transient($transient_key, $data, 12 * 3600);
+        // Debug: Log API response
+        error_log('API Response: ' . $body);
+
+        // Check if response contains an error
+        if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
+            error_log('API Error: Access forbidden - ' . ($data['message'] ?? 'Unknown error'));
+            echo '<div class="alert alert-danger">API Access Forbidden: Invalid access key. Please check your access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
+            // Don't save error data to transient
+            $data = [];
+        } elseif (isset($data['code'])) {
+            error_log('API Error: ' . $data['code'] . ' - ' . ($data['message'] ?? 'Unknown error'));
+            echo '<div class="alert alert-danger">API Error: ' . esc_html($data['message'] ?? 'Unknown error') . '</div>';
+            $data = [];
+        }
+
+        // Only save valid data to transient
+        if (!isset($data['code'])) {
+            set_transient($transient_key, $data, 12 * 3600);
+        }
+    }
+
+    // Check if data contains error before filtering
+    if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
+        // Reset data to empty array if it contains an error
+        echo '<div class="alert alert-danger">API Access Forbidden: Invalid access key. Please check your access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
+        $data = [];
     }
 
     // Filter data based on include parameter

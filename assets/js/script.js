@@ -84,7 +84,16 @@
         const portfoliosData = document.querySelector('#portfolios-data');
         if (portfoliosData) {
           try {
-            this.portfolios = JSON.parse(portfoliosData.textContent) || [];
+            const parsedData = JSON.parse(portfoliosData.textContent) || [];
+            
+            // Check if parsed data contains an error
+            if (parsedData.length === 1 && parsedData[0] && parsedData[0].code === 'rest_forbidden') {
+              console.error('API returned forbidden error:', parsedData[0].message);
+              this.portfolios = [];
+            } else {
+              this.portfolios = parsedData;
+            }
+            
             this.filterPortfolios();
           } catch (e) {
             console.error('Error parsing portfolios data:', e);
@@ -143,10 +152,23 @@
           console.log('First portfolio structure:', this.portfolios[0]);
         }
         
+        // Check if portfolios data is valid
+        if (this.portfolios.length === 0 || (this.portfolios.length === 1 && this.portfolios[0] && this.portfolios[0].code === 'rest_forbidden')) {
+          console.log('Invalid portfolios data detected, using empty array');
+          this.filteredPortfolios = [];
+          return;
+        }
+        
         if (this.selectedCategory && this.selectedCategory !== '') {
           this.filteredPortfolios = this.portfolios.filter(portfolio => {
+            // Skip invalid portfolio items
+            if (!portfolio || typeof portfolio !== 'object') {
+              console.log('Skipping invalid portfolio item');
+              return false;
+            }
+            
             console.log('Checking portfolio:', portfolio.title, 'jenis:', portfolio.jenis, 'against category:', this.selectedCategory);
-            return portfolio && portfolio.jenis && (
+            return portfolio.jenis && (
               portfolio.jenis === this.selectedCategory || 
               (Array.isArray(portfolio.jenis) && portfolio.jenis.includes(this.selectedCategory)) ||
               (typeof portfolio.jenis === 'string' && portfolio.jenis.includes(this.selectedCategory))
