@@ -12,7 +12,7 @@
  * Plugin Name:   Sweet Portofolio
  * Plugin URI:    Portofolio Website Simple untuk mitra websweetstudio.com
  * Description:   Plugin untuk web utama
- * Version:       1.0.613
+ * Version:       1.1.0
  * Author:        Aditya K
  * Author URI:    https://websweetstudio.com
  * Text Domain:   sweet-portofolio
@@ -39,7 +39,6 @@ define('SWEETPORTOFOLIO_VERSION', '1.0.613');
 define('SWEETPORTOFOLIO_URL', plugin_dir_url(__FILE__));
 
 $files = array(
-    'inc/shortcode.php',
     'inc/enqueue.php',
     'inc/sweet-options.php',
     'inc/rest-api.php',
@@ -86,29 +85,31 @@ add_action('init', 'sweet_portofolio_init');
 // Activation hook
 register_activation_hook(__FILE__, 'sweet_portofolio_activate');
 
-function sweet_portofolio_activate() {
+function sweet_portofolio_activate()
+{
     // Check if pages already exist
     $portfolio_page_id = get_option('portofolio_page');
     $preview_page_id = get_option('portofolio_preview_page');
-    
+
     // Create portfolio page if it doesn't exist
     if (!$portfolio_page_id || $portfolio_page_id == '-1' || !get_post($portfolio_page_id)) {
         $portfolio_page = array(
             'post_title'    => 'Portofolio',
-            'post_content'  => '[sweet-portofolio-jenis-web]' . "\n\n" . '[sweet-portofolio-list default="profil-perusahaan"]',
+            'post_content'  => '',
             'post_status'   => 'publish',
             'post_author'   => 1,
             'post_type'     => 'page',
             'post_name'     => 'portofolio'
         );
-        
+
         $new_portfolio_page_id = wp_insert_post($portfolio_page);
-        
+
         if ($new_portfolio_page_id && !is_wp_error($new_portfolio_page_id)) {
             update_option('portofolio_page', $new_portfolio_page_id);
+            update_post_meta($new_portfolio_page_id, '_wp_page_template', 'page-portfolio-list.php');
         }
     }
-    
+
     // Create preview page if it doesn't exist
     if (!$preview_page_id || $preview_page_id == '-1' || !get_post($preview_page_id)) {
         $preview_page = array(
@@ -119,9 +120,9 @@ function sweet_portofolio_activate() {
             'post_type'     => 'page',
             'post_name'     => 'preview-portofolio'
         );
-        
+
         $new_preview_page_id = wp_insert_post($preview_page);
-        
+
         if ($new_preview_page_id && !is_wp_error($new_preview_page_id)) {
             update_option('portofolio_preview_page', $new_preview_page_id);
             update_post_meta($new_preview_page_id, '_wp_page_template', 'page-preview.php');

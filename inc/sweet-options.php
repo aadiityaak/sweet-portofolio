@@ -620,7 +620,7 @@ function portofolio_generate_pages()
         // Create portfolio page
         $portfolio_page = array(
             'post_title'    => 'Portofolio',
-            'post_content'  => '[sweet-portofolio-jenis-web]' . "\n\n" . '[sweet-portofolio-list default="profil-perusahaan"]',
+            'post_content'  => '',
             'post_status'   => 'publish',
             'post_author'   => 1,
             'post_type'     => 'page',
@@ -632,6 +632,7 @@ function portofolio_generate_pages()
         if ($portfolio_page_id && !is_wp_error($portfolio_page_id)) {
             // Save the page ID to options
             update_option('portofolio_page', $portfolio_page_id);
+            update_post_meta($portfolio_page_id, '_wp_page_template', 'page-portfolio-list.php');
             $messages[] = "Portfolio page created successfully.";
         } else {
             $messages[] = "Error creating portfolio page.";
