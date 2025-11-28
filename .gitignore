@@ -55,3 +55,4 @@ phpcs.xml
 dist/
 dist-product/
 **/img
+.claude

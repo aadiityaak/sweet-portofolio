@@ -188,7 +188,7 @@ $categories_data = get_transient('jenis_web_data');
     .card-image {
         position: relative;
         overflow: hidden;
-        height: 200px;
+        aspect-ratio: 1/1;
         width: 100%;
         z-index: 1;
         display: flex;
