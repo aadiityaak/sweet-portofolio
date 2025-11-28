@@ -1,0 +1,19 @@
+{
+  "name": "sweet-portofolio",
+  "version": "1.0.0",
+  "description": "Sweet Portfolio WordPress Plugin",
+  "main": "assets/js/script.js",
+  "scripts": {
+    "build": "npm run build:css && npm run build:js && npm run copy-assets",
+    "build:css": "cleancss -o dist/assets/css/style.min.css assets/css/style.css",
+    "build:js": "terser assets/js/script.js -o dist/assets/js/script.min.js --compress --mangle",
+    "build:production": "npm run build && npm run zip",
+    "copy-assets": "xcopy /E /I /Y inc dist\\inc && copy /Y *.php dist\\ && copy /Y README.md dist\\",
+    "dev": "npm run build",
+    "zip": "cd dist && (if exist sweet-portofolio rmdir /s /q sweet-portofolio) && mkdir sweet-portofolio && xcopy /E /I /Y assets sweet-portofolio\\assets >nul && xcopy /E /I /Y inc sweet-portofolio\\inc >nul && copy *.php sweet-portofolio\\ >nul && copy README.md sweet-portofolio\\ >nul && powershell -NoProfile -Command \"Compress-Archive -Force -Path '.\\sweet-portofolio' -DestinationPath '.\\sweet-portofolio.zip'\""
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "terser": "^5.19.4"
+  }
+}
