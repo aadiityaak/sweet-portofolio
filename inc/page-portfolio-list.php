@@ -99,6 +99,29 @@ $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web'])
 
 // Get categories for filter dropdown
 $categories_data = get_transient('jenis_web_data');
+
+// If categories data is not available, fetch it
+if (!$categories_data) {
+    if (!empty($access_key)) {
+        $categories_api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
+        $response = wp_remote_get($categories_api_url);
+
+        if (!is_wp_error($response)) {
+            $body = wp_remote_retrieve_body($response);
+            $categories_data = json_decode($body, true);
+
+            // Save categories to transient for 12 hours
+            if (is_array($categories_data) && !isset($categories_data['code'])) {
+                set_transient('jenis_web_data', $categories_data, 12 * 3600);
+            }
+        }
+    }
+
+    // If still no data, set as empty array
+    if (!is_array($categories_data)) {
+        $categories_data = array();
+    }
+}
 ?>
 <?php get_header(); ?>
 
@@ -457,15 +480,7 @@ $categories_data = get_transient('jenis_web_data');
                                 ?>
                             </select>
                         </div>
-                        <div class="filter-group">
-                            <select x-model="itemsPerPage" @change="filterPortfolios()" class="filter-select">
-                                <option value="6">6 items</option>
-                                <option value="12">12 items</option>
-                                <option value="24">24 items</option>
-                                <option value="48">48 items</option>
-                            </select>
-                        </div>
-                    </div>
+                      </div>
                 </div>
 
                 <div class="frame-portofolio">

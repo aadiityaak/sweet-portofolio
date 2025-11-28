@@ -71,7 +71,7 @@
       portfolios: [],
       filteredPortfolios: [],
       currentPage: initialPage,
-      itemsPerPage: 12,
+      itemsPerPage: 12, // Fixed value
       selectedCategory: initialCategory,
       showTitle: showTitle,
       styleThumbnail: styleThumbnail,
@@ -81,11 +81,13 @@
       portofolioSelection: portofolioSelection,
       
       init() {
+        console.log('portfolioGrid init with itemsPerPage:', this.itemsPerPage);
+
         const portfoliosData = document.querySelector('#portfolios-data');
         if (portfoliosData) {
           try {
             const parsedData = JSON.parse(portfoliosData.textContent) || [];
-            
+
             // Check if parsed data contains an error
             if (parsedData.length === 1 && parsedData[0] && parsedData[0].code === 'rest_forbidden') {
               console.error('API returned forbidden error:', parsedData[0].message);
@@ -93,7 +95,7 @@
             } else {
               this.portfolios = parsedData;
             }
-            
+
             this.filterPortfolios();
           } catch (e) {
             console.error('Error parsing portfolios data:', e);
@@ -137,7 +139,7 @@
       filterPortfolios() {
         // Reset to page 1 when filter changes
         this.currentPage = 1;
-        
+
         // Ensure portfolios is an array
         if (!Array.isArray(this.portfolios)) {
           this.portfolios = [];
