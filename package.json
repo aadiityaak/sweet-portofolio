@@ -8,9 +8,9 @@
     "build:css": "cleancss -o dist/assets/css/style.min.css assets/css/style.css",
     "build:js": "terser assets/js/script.js -o dist/assets/js/script.min.js --compress --mangle",
     "build:production": "npm run build && npm run zip",
-    "copy-assets": "xcopy /E /I /Y inc dist\\inc && copy /Y *.php dist\\ && copy /Y README.md dist\\",
+    "copy-assets": "xcopy /E /I /Y inc dist\\inc >nul && powershell -NoProfile -Command \"Copy-Item -Path *.php -Destination dist\\ -Force\" && powershell -NoProfile -Command \"Copy-Item -Path README.md -Destination dist\\ -Force\"",
     "dev": "npm run build",
-    "zip": "cd dist && (if exist sweet-portofolio rmdir /s /q sweet-portofolio) && mkdir sweet-portofolio && xcopy /E /I /Y assets sweet-portofolio\\assets >nul && xcopy /E /I /Y inc sweet-portofolio\\inc >nul && copy *.php sweet-portofolio\\ >nul && copy README.md sweet-portofolio\\ >nul && powershell -NoProfile -Command \"Compress-Archive -Force -Path '.\\sweet-portofolio' -DestinationPath '.\\sweet-portofolio.zip'\""
+    "zip": "cd dist && (if exist sweet-portofolio rmdir /s /q sweet-portofolio) && mkdir sweet-portofolio && xcopy /E /I /Y assets sweet-portofolio\\assets >nul && xcopy /E /I /Y inc sweet-portofolio\\inc >nul && powershell -NoProfile -Command \"Copy-Item -Path *.php -Destination sweet-portofolio\\ -Force\" && powershell -NoProfile -Command \"Copy-Item -Path README.md -Destination sweet-portofolio\\ -Force\" && powershell -NoProfile -Command \"Compress-Archive -Force -Path '.\\sweet-portofolio' -DestinationPath '.\\sweet-portofolio.zip'\""
   },
   "devDependencies": {
     "clean-css-cli": "^5.6.3",
