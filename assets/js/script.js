@@ -66,7 +66,7 @@
     }));
     
     // Portfolio component for filtering and pagination
-    Alpine.data('portfolioGrid', (initialPage = 1, initialCategory = '', showTitle = 'yes', styleThumbnail = '', previewPage = '', whatsappNumber = '', portofolioCredit = '', portofolioSelection = []) => ({
+    Alpine.data('portfolioGrid', (initialPage = 1, initialCategory = '', showTitle = 'yes', styleThumbnail = '', previewPage = '', whatsappNumber = '', portofolioCredit = '', portofolioSelection = [], selectedIds = []) => ({
       filterFormOpen: false,
       portfolios: [],
       filteredPortfolios: [],
@@ -79,6 +79,7 @@
       whatsappNumber: whatsappNumber,
       portofolioCredit: portofolioCredit,
       portofolioSelection: portofolioSelection,
+      selectedIds: selectedIds,
       
       init() {
         console.log('portfolioGrid init with itemsPerPage:', this.itemsPerPage);
@@ -161,7 +162,24 @@
           return;
         }
         
-        if (this.selectedCategory && this.selectedCategory !== '') {
+        if (Array.isArray(this.selectedIds) && this.selectedIds.length > 0) {
+          const idSet = new Set(this.selectedIds.map((v) => parseInt(v)));
+          this.filteredPortfolios = this.portfolios.filter(portfolio => {
+            if (!portfolio || portfolio.id === undefined || portfolio.id === null) return false;
+            const pid = parseInt(portfolio.id);
+            return idSet.has(pid);
+          });
+          if (this.selectedCategory && this.selectedCategory !== '') {
+            this.filteredPortfolios = this.filteredPortfolios.filter(portfolio => {
+              if (!portfolio || typeof portfolio !== 'object') return false;
+              return portfolio.jenis && (
+                portfolio.jenis === this.selectedCategory ||
+                (Array.isArray(portfolio.jenis) && portfolio.jenis.includes(this.selectedCategory)) ||
+                (typeof portfolio.jenis === 'string' && portfolio.jenis.includes(this.selectedCategory))
+              );
+            });
+          }
+        } else if (this.selectedCategory && this.selectedCategory !== '') {
           this.filteredPortfolios = this.portfolios.filter(portfolio => {
             // Skip invalid portfolio items
             if (!portfolio || typeof portfolio !== 'object') {

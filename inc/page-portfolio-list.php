@@ -23,6 +23,7 @@ $portofolio_selection = get_option('portofolio_selection');
 $whatsapp_number = get_option('portofolio_whatsapp_number');
 $portofolio_credit = get_option('portofolio_credit');
 $portofolio_page = get_option('portofolio_page');
+$shortcode_ids = isset($shortcode_ids) && is_array($shortcode_ids) ? $shortcode_ids : array();
 
 // Ensure portofolio_selection is an array
 if (!is_array($portofolio_selection)) {
@@ -123,7 +124,9 @@ if (!$categories_data) {
     }
 }
 ?>
-<?php get_header(); ?>
+<?php if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
+    get_header();
+} ?>
 
 <style>
     /* Hide WhatsApp widget from main plugin on portfolio list page */
@@ -462,6 +465,10 @@ if (!$categories_data) {
                         return "'" . esc_js($item) . "'";
                     }, $portofolio_selection)) . ']';
                     ?>
+                ,
+                <?php
+                echo '[' . implode(',', array_map('intval', $shortcode_ids)) . ']';
+                ?>
                 )">
                 <!-- Filter Form with Alpine.js -->
                 <div class="filter-section">
@@ -480,7 +487,7 @@ if (!$categories_data) {
                                 ?>
                             </select>
                         </div>
-                      </div>
+                    </div>
                 </div>
 
                 <div class="frame-portofolio">
@@ -539,4 +546,6 @@ if (!$categories_data) {
     </main><!-- #main -->
 </div><!-- #primary -->
 
-<?php get_footer(); ?>
+<?php if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
+    get_footer();
+} ?>

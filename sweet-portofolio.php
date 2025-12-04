@@ -82,6 +82,30 @@ function sweet_portofolio_init()
 }
 add_action('init', 'sweet_portofolio_init');
 
+function sweet_portofolio_render_portofolio_list_shortcode($atts = array())
+{
+    $atts = shortcode_atts(array(
+        'ids' => ''
+    ), $atts, 'portofolio_list');
+
+    $shortcode_ids = array();
+    if (!empty($atts['ids'])) {
+        $shortcode_ids = array_filter(array_map('intval', array_map('trim', explode(',', $atts['ids']))));
+    }
+
+    ob_start();
+    if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
+        define('SWEETPORTOFOLIO_SHORTCODE', true);
+    }
+    wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/style.css', array(), SWEETPORTOFOLIO_VERSION);
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), SWEETPORTOFOLIO_VERSION, true);
+    wp_enqueue_script('sweet-alpine-js-frontend', 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
+    include plugin_dir_path(__FILE__) . 'inc/page-portfolio-list.php';
+    return ob_get_clean();
+}
+add_shortcode('portofolio_list', 'sweet_portofolio_render_portofolio_list_shortcode');
+
 // Activation hook
 register_activation_hook(__FILE__, 'sweet_portofolio_activate');
 
