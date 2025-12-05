@@ -38,8 +38,6 @@ function portofolio_settings_page_content()
         }
         
         .sweet-portofolio-header {
-            background: #3b82f6;
-            color: white;
             padding: 30px;
             border-radius: 12px;
             margin-bottom: 30px;

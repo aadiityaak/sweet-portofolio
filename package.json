@@ -4,17 +4,18 @@
   "description": "Sweet Portfolio WordPress Plugin",
   "main": "assets/js/script.js",
   "scripts": {
-    "prebuild": "powershell -NoProfile -Command \"$paths = @('dist\\assets\\css','dist\\assets\\js','dist\\inc'); foreach ($p in $paths) { New-Item -ItemType Directory -Force -Path $p | Out-Null }\"",
+    "prebuild": "powershell -NoProfile -Command \"Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 'dist\\sweet-portofolio'; Remove-Item -Force -ErrorAction SilentlyContinue 'dist\\sweet-portofolio.zip'; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 'dist\\assets'; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue 'dist\\inc'; Remove-Item -Force -ErrorAction SilentlyContinue 'dist\\README.md'; Remove-Item -Force -ErrorAction SilentlyContinue 'dist\\sweet-portofolio.php'; $paths = @('dist\\sweet-portofolio\\assets\\css','dist\\sweet-portofolio\\assets\\js','dist\\sweet-portofolio\\inc'); foreach ($p in $paths) { New-Item -ItemType Directory -Force -Path $p | Out-Null }\"",
     "build": "npm run build:css && npm run build:js && npm run copy-assets",
-    "build:css": "cleancss -o dist/assets/css/style.min.css assets/css/style.css",
-    "build:js": "terser assets/js/script.js -o dist/assets/js/script.min.js --compress --mangle",
+    "build:css": "cleancss -o dist/sweet-portofolio/assets/css/style.min.css assets/css/style.css",
+    "build:js": "terser assets/js/script.js -o dist/sweet-portofolio/assets/js/script.min.js --compress --mangle",
     "build:production": "npm run build && npm run zip",
-    "copy-assets": "powershell -NoProfile -Command \"Copy-Item -Recurse -Force -Path inc\\* -Destination dist\\inc\" && powershell -NoProfile -Command \"Copy-Item -Path *.php -Destination dist\\ -Force\" && powershell -NoProfile -Command \"Copy-Item -Path README.md -Destination dist\\ -Force\"",
+    "copy-assets": "powershell -NoProfile -Command \"Copy-Item -Recurse -Force -Path assets\\* -Destination dist\\sweet-portofolio\\assets\" && powershell -NoProfile -Command \"Copy-Item -Recurse -Force -Path inc\\* -Destination dist\\sweet-portofolio\\inc\" && powershell -NoProfile -Command \"Copy-Item -Path sweet-portofolio.php -Destination dist\\sweet-portofolio\\ -Force\" && powershell -NoProfile -Command \"Copy-Item -Path README.md -Destination dist\\sweet-portofolio\\ -Force\"",
     "dev": "npm run build",
-    "zip": "cd dist && (if exist sweet-portofolio rmdir /s /q sweet-portofolio) && mkdir sweet-portofolio && xcopy /E /I /Y assets sweet-portofolio\\assets >nul && xcopy /E /I /Y inc sweet-portofolio\\inc >nul && powershell -NoProfile -Command \"Copy-Item -Path *.php -Destination sweet-portofolio\\ -Force\" && powershell -NoProfile -Command \"Copy-Item -Path README.md -Destination sweet-portofolio\\ -Force\" && powershell -NoProfile -Command \"Remove-Item -Force -ErrorAction SilentlyContinue '.\\sweet-portofolio.zip'; Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::CreateFromDirectory('.\\sweet-portofolio', '.\\sweet-portofolio.zip')\""
+    "zip": "powershell -NoProfile -Command \"Set-Location 'dist'; Remove-Item -Force -ErrorAction SilentlyContinue 'sweet-portofolio.zip'; npx bestzip sweet-portofolio.zip sweet-portofolio/*\""
   },
   "devDependencies": {
     "clean-css-cli": "^5.6.3",
-    "terser": "^5.19.4"
+    "terser": "^5.19.4",
+    "bestzip": "^2.2.1"
   }
 }
