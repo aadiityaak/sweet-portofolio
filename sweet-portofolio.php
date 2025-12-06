@@ -85,12 +85,18 @@ add_action('init', 'sweet_portofolio_init');
 function sweet_portofolio_render_portofolio_list_shortcode($atts = array())
 {
     $atts = shortcode_atts(array(
-        'ids' => ''
+        'ids' => '',
+        'filter' => 'yes',
+        'category' => ''
     ), $atts, 'portofolio_list');
 
     $shortcode_ids = array();
     if (!empty($atts['ids'])) {
         $shortcode_ids = array_filter(array_map('intval', array_map('trim', explode(',', $atts['ids']))));
+    }
+    $shortcode_category = '';
+    if (!empty($atts['category'])) {
+        $shortcode_category = sanitize_text_field($atts['category']);
     }
 
     ob_start();

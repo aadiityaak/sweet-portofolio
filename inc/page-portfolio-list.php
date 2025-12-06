@@ -97,6 +97,9 @@ if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
 // Get current page from URL
 $current_page = isset($_GET['halaman']) ? (int)$_GET['halaman'] : 1;
 $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : '';
+if (isset($shortcode_category) && !empty($shortcode_category)) {
+    $jenis_web = $shortcode_category;
+}
 
 // Get categories for filter dropdown
 $categories_data = get_transient('jenis_web_data');
@@ -471,24 +474,27 @@ if (!$categories_data) {
                 ?>
                 )">
                 <!-- Filter Form with Alpine.js -->
-                <div class="filter-section">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="filter-select">
-                                <option value="">All Categories</option>
-                                <?php
-                                if (is_array($categories_data) && !empty($portofolio_selection)) {
-                                    foreach ($categories_data as $category) {
-                                        if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
-                                            echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
+                <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes';
+                if ($filter_attr !== 'no') : ?>
+                    <div class="filter-section">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="filter-select">
+                                    <option value="">All Categories</option>
+                                    <?php
+                                    if (is_array($categories_data) && !empty($portofolio_selection)) {
+                                        foreach ($categories_data as $category) {
+                                            if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
+                                                echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
+                                            }
                                         }
                                     }
-                                }
-                                ?>
-                            </select>
+                                    ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
+                <?php endif; ?>
 
                 <div class="frame-portofolio">
                     <template x-for="(item, index) in paginatedPortfolios" :key="'portfolio-' + (item.id || index)">
