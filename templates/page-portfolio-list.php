@@ -227,7 +227,7 @@ if (!$categories_data) {
                 </div>
 
                 <!-- Pagination with Alpine.js -->
-                <div x-show="totalPages > 1" class="pagination">
+                <div x-show="totalPages > 1" class="pagination" x-cloak>
                     <button @click="goToPage(currentPage - 1)" class="pagination-btn" :class="{'disabled': currentPage === 1}" :disabled="currentPage === 1" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </button>
@@ -241,7 +241,7 @@ if (!$categories_data) {
                     </button>
                 </div>
 
-                <div class="pagination-info" x-show="totalPages > 1">
+                <div class="pagination-info" x-show="totalPages > 1" x-cloak>
                     <span x-text="`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filteredPortfolios.length)} dari ${filteredPortfolios.length} items`"></span>
                 </div>
             </div>
