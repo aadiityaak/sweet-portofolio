@@ -10,7 +10,6 @@
 
   // Alpine.js initialization
   document.addEventListener("alpine:init", () => {
-    console.log("Alpine.js initialized");
     // Modal component for category selection
     Alpine.data("categoryModal", () => ({
       modalOpen: false,
@@ -18,12 +17,10 @@
       selectedCategory: "",
 
       init() {
-        console.log("Initializing category modal");
         const categoriesData = document.querySelector("#categories-data");
         if (categoriesData) {
           try {
             this.categories = JSON.parse(categoriesData.textContent) || [];
-            console.log("Categories data loaded:", this.categories);
           } catch (e) {
             console.error("Error parsing categories data:", e);
             this.categories = [];
@@ -39,12 +36,6 @@
       },
 
       selectCategory(categorySlug) {
-        console.log("Category selected:", categorySlug);
-        console.log(
-          "Category object:",
-          this.categories.find((cat) => cat.slug === categorySlug),
-        );
-
         // Close modal immediately
         this.modalOpen = false;
 
@@ -58,7 +49,6 @@
         window.history.pushState({}, "", url);
 
         // Trigger a custom event to notify the portfolio component
-        console.log("Dispatching categoryChanged event");
         window.dispatchEvent(
           new CustomEvent("categoryChanged", {
             detail: { category: categorySlug },
@@ -101,11 +91,6 @@
         selectedIds: selectedIds,
 
         init() {
-          console.log(
-            "portfolioGrid init with itemsPerPage:",
-            this.itemsPerPage,
-          );
-
           const portfoliosData = document.querySelector("#portfolios-data");
           if (portfoliosData) {
             try {
@@ -133,16 +118,11 @@
 
           // Listen for URL changes
           window.addEventListener("popstate", () => {
-            console.log("popstate event detected");
             this.updateFromURL();
           });
 
           // Listen for category changes from modal
           window.addEventListener("categoryChanged", (event) => {
-            console.log(
-              "categoryChanged event received:",
-              event.detail.category,
-            );
             this.selectedCategory = event.detail.category;
             this.currentPage = 1; // Reset to page 1
             this.filterPortfolios();
@@ -165,12 +145,6 @@
           const urlParams = new URLSearchParams(window.location.search);
           this.selectedCategory = urlParams.get("jenis_web") || "";
           this.currentPage = parseInt(urlParams.get("halaman")) || 1;
-          console.log(
-            "updateFromURL: category =",
-            this.selectedCategory,
-            ", page =",
-            this.currentPage,
-          );
 
           // Update the select dropdown if it exists
           const categoryFilter = document.getElementById("category-filter");
@@ -190,18 +164,6 @@
             this.portfolios = [];
           }
 
-          console.log(
-            "Filtering portfolios. Selected category:",
-            this.selectedCategory,
-          );
-          console.log("Total portfolios:", this.portfolios.length);
-          console.log("Portfolio selection:", this.portofolioSelection);
-
-          // Debug: Print first portfolio to understand structure
-          if (this.portfolios.length > 0) {
-            console.log("First portfolio structure:", this.portfolios[0]);
-          }
-
           // Check if portfolios data is valid
           if (
             this.portfolios.length === 0 ||
@@ -209,7 +171,6 @@
               this.portfolios[0] &&
               this.portfolios[0].code === "rest_forbidden")
           ) {
-            console.log("Invalid portfolios data detected, using empty array");
             this.filteredPortfolios = [];
             return;
           }
@@ -245,18 +206,8 @@
             this.filteredPortfolios = this.portfolios.filter((portfolio) => {
               // Skip invalid portfolio items
               if (!portfolio || typeof portfolio !== "object") {
-                console.log("Skipping invalid portfolio item");
                 return false;
               }
-
-              console.log(
-                "Checking portfolio:",
-                portfolio.title,
-                "jenis:",
-                portfolio.jenis,
-                "against category:",
-                this.selectedCategory,
-              );
               return (
                 portfolio.jenis &&
                 (portfolio.jenis === this.selectedCategory ||
@@ -280,11 +231,6 @@
           } else {
             this.filteredPortfolios = [...this.portfolios];
           }
-
-          console.log(
-            "Filtered portfolios count:",
-            this.filteredPortfolios.length,
-          );
 
           // Update URL when filter changes
           this.updateURL();
@@ -341,10 +287,6 @@
 
         getImageUrl(portfolio) {
           if (!portfolio) return "";
-
-          // Debug logging
-          console.log("Getting image URL for portfolio:", portfolio);
-          console.log("Style thumbnail setting:", this.styleThumbnail);
 
           // Helper function to clean URL from backticks
           const cleanUrl = (url) => {
@@ -422,7 +364,6 @@
             }
           }
 
-          console.log("Final image URL:", imageUrl);
           return imageUrl;
         },
 
@@ -474,7 +415,6 @@
       // Function to open the modal
       function openModal(event) {
         event.preventDefault();
-        console.log("Opening modal via fallback");
 
         // Force display with !important to override any CSS
         modal.style.setProperty("display", "block", "important");
@@ -496,7 +436,6 @@
                 const componentData = Alpine.$data(alpineComponent);
                 if (componentData && componentData.modalOpen !== undefined) {
                   componentData.modalOpen = true;
-                  console.log("Set modalOpen via closest x-data element");
                 }
               }
 
@@ -504,13 +443,11 @@
               const modalComponent = Alpine.$data(modal.parentElement);
               if (modalComponent && modalComponent.modalOpen !== undefined) {
                 modalComponent.modalOpen = true;
-                console.log("Set modalOpen via Alpine.$data");
               }
 
               // Method 3: Try to evaluate Alpine expression
               if (Alpine.evaluate) {
                 Alpine.evaluate(modal, "modalOpen = true");
-                console.log("Set modalOpen via Alpine.evaluate");
               }
             } catch (e) {
               console.error("Error setting modalOpen via Alpine:", e);
@@ -523,7 +460,6 @@
       function closeModal(event) {
         event.preventDefault();
         event.stopPropagation();
-        console.log("Closing modal via fallback");
 
         // Force hide with !important to override any CSS
         modal.style.setProperty("display", "none", "important");
@@ -543,9 +479,6 @@
                 const componentData = Alpine.$data(alpineComponent);
                 if (componentData && componentData.modalOpen !== undefined) {
                   componentData.modalOpen = false;
-                  console.log(
-                    "Set modalOpen to false via closest x-data element",
-                  );
                 }
               }
 
@@ -553,13 +486,11 @@
               const modalComponent = Alpine.$data(modal.parentElement);
               if (modalComponent && modalComponent.modalOpen !== undefined) {
                 modalComponent.modalOpen = false;
-                console.log("Set modalOpen to false via Alpine.$data");
               }
 
               // Method 3: Try to evaluate Alpine expression
               if (Alpine.evaluate) {
                 Alpine.evaluate(modal, "modalOpen = false");
-                console.log("Set modalOpen to false via Alpine.evaluate");
               }
             } catch (e) {
               console.error("Error setting modalOpen to false via Alpine:", e);
@@ -583,7 +514,6 @@
 
           // Get category from the element
           const categoryText = this.querySelector(".fw-bold").textContent;
-          console.log("Category clicked via fallback:", categoryText);
 
           // Find matching category from data
           const categoriesData = document.querySelector("#categories-data");
@@ -638,13 +568,9 @@
       setTimeout(() => {
         const trigger = document.querySelector(".btn-modal-portofolio");
         if (trigger) {
-          console.log(
-            "Adding additional click listener for Alpine.js compatibility",
-          );
           trigger.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log("Modal button clicked via additional listener");
 
             const modal = document.querySelector(".frame-modal-portofolio");
             if (modal) {
@@ -661,7 +587,6 @@
                   const componentData = Alpine.$data(alpineComponent);
                   if (componentData && componentData.modalOpen !== undefined) {
                     componentData.modalOpen = true;
-                    console.log("Set modalOpen via additional listener");
                   }
                 } catch (e) {
                   console.error(
@@ -680,13 +605,9 @@
         setTimeout(() => {
           const trigger = document.querySelector(".btn-modal-portofolio");
           if (trigger) {
-            console.log(
-              "Adding additional click listener after Alpine.js init",
-            );
             trigger.addEventListener("click", function (e) {
               e.preventDefault();
               e.stopPropagation();
-              console.log("Modal button clicked via post-init listener");
 
               const modal = document.querySelector(".frame-modal-portofolio");
               if (modal) {
@@ -706,7 +627,6 @@
                       componentData.modalOpen !== undefined
                     ) {
                       componentData.modalOpen = true;
-                      console.log("Set modalOpen via post-init listener");
                     }
                   } catch (e) {
                     console.error(

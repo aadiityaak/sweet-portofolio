@@ -26,7 +26,7 @@ if (! defined('ABSPATH')) exit;
 /**
  * Currently plugin version.
  */
-define('SWEETPORTOFOLIO_VERSION', '1.0.614');
+define('SWEETPORTOFOLIO_VERSION', '1.0.616');
 
 /**
  * Define plugin path url

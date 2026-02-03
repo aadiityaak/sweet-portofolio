@@ -59,11 +59,9 @@ class Enqueue {
             ?>
             <script>
             // Make sure wpApiSettings is available
-            console.log('Setting up wpApiSettings');
             window.wpApiSettings = window.wpApiSettings || {};
             window.wpApiSettings.nonce = '<?php echo wp_create_nonce('wp_rest'); ?>';
             window.wpApiSettings.root = '<?php echo esc_url_raw(rest_url()); ?>';
-            console.log('wpApiSettings configured:', window.wpApiSettings);
             </script>
             <?php
         }

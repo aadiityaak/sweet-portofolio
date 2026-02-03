@@ -357,8 +357,6 @@ class Settings
         <script>
             // Make sure Alpine.js is loaded before initializing components
             document.addEventListener('DOMContentLoaded', () => {
-                console.log('DOM loaded');
-                console.log('wpApiSettings:', window.wpApiSettings);
 
                 // Check if Alpine.js is loaded
                 if (typeof Alpine === 'undefined') {
@@ -366,11 +364,9 @@ class Settings
                     return;
                 }
 
-                console.log('Alpine.js is loaded');
             });
 
             document.addEventListener('alpine:init', () => {
-                console.log('Alpine.js initializing');
 
                 // Function to generate portfolio page
                 Alpine.data('portfolioPageGenerator', () => ({
@@ -379,15 +375,12 @@ class Settings
                     messageType: '',
 
                     async generatePortfolioPage(force = true) {
-                        console.log('generatePortfolioPage called with force:', force);
-                        console.log('wpApiSettings.nonce:', wpApiSettings.nonce);
 
                         this.generating = true;
                         this.message = '';
 
                         try {
                             const apiUrl = '<?php echo rest_url('sweet-portofolio/v1/generate-portfolio-page'); ?>';
-                            console.log('Making request to:', apiUrl);
 
                             const response = await fetch(apiUrl, {
                                 method: 'POST',
@@ -400,54 +393,38 @@ class Settings
                                 })
                             });
 
-                            console.log('Response status:', response.status);
-                            console.log('Response ok:', response.ok);
-
                             const data = await response.json();
-                            console.log('Response data:', data);
 
                             if (response.ok) {
                                 this.message = data.message || 'Portfolio page created successfully!';
                                 this.messageType = 'success';
-                                console.log('Success message:', this.message);
 
                                 // Update the select dropdown
                                 if (data.page_id) {
-                                    console.log('Updating select dropdown with page_id:', data.page_id);
                                     const select = document.getElementById('portofolio_page_select');
                                     if (select) {
-                                        console.log('Select element found with', select.options.length, 'options');
-                                        // Log all current options
-                                        for (let i = 0; i < select.options.length; i++) {
-                                            console.log('Option', i, ': value=', select.options[i].value, ', text=', select.options[i].text);
-                                        }
-
                                         // Add new option if not exists
                                         let optionExists = false;
                                         for (let i = 0; i < select.options.length; i++) {
                                             if (select.options[i].value == data.page_id) {
                                                 optionExists = true;
                                                 select.selectedIndex = i;
-                                                console.log('Found existing option at index', i);
                                                 break;
                                             }
                                         }
 
                                         if (!optionExists) {
-                                            console.log('Adding new option to select');
                                             const newOption = document.createElement('option');
                                             newOption.value = data.page_id;
                                             newOption.text = data.page_title || 'Portofolio';
                                             newOption.selected = true;
                                             select.appendChild(newOption);
-                                            console.log('New option added and selected');
 
                                             // Trigger change event to notify WordPress
                                             const changeEvent = new Event('change', {
                                                 bubbles: true
                                             });
                                             select.dispatchEvent(changeEvent);
-                                            console.log('Change event dispatched');
                                         }
                                     } else {
                                         console.error('Select element not found');
@@ -468,7 +445,6 @@ class Settings
                             this.messageType = 'error';
                         } finally {
                             this.generating = false;
-                            console.log('Generation process completed');
 
                             // Clear message after 5 seconds
                             setTimeout(() => {
@@ -495,15 +471,12 @@ class Settings
                     messageType: '',
 
                     async generatePreviewPage(force = true) {
-                        console.log('generatePreviewPage called with force:', force);
-                        console.log('wpApiSettings.nonce:', wpApiSettings.nonce);
 
                         this.generating = true;
                         this.message = '';
 
                         try {
                             const apiUrl = '<?php echo rest_url('sweet-portofolio/v1/generate-preview-page'); ?>';
-                            console.log('Making request to:', apiUrl);
 
                             const response = await fetch(apiUrl, {
                                 method: 'POST',
@@ -516,11 +489,7 @@ class Settings
                                 })
                             });
 
-                            console.log('Response status:', response.status);
-                            console.log('Response ok:', response.ok);
-
                             const data = await response.json();
-                            console.log('Response data:', data);
 
                             if (response.ok) {
                                 this.message = data.message || 'Preview page created successfully!';
@@ -528,41 +497,30 @@ class Settings
 
                                 // Update the select dropdown
                                 if (data.page_id) {
-                                    console.log('Updating preview select dropdown with page_id:', data.page_id);
                                     const select = document.getElementById('portofolio_preview_page_select');
                                     if (select) {
-                                        console.log('Preview select element found with', select.options.length, 'options');
-                                        // Log all current options
-                                        for (let i = 0; i < select.options.length; i++) {
-                                            console.log('Preview Option', i, ': value=', select.options[i].value, ', text=', select.options[i].text);
-                                        }
-
                                         // Add new option if not exists
                                         let optionExists = false;
                                         for (let i = 0; i < select.options.length; i++) {
                                             if (select.options[i].value == data.page_id) {
                                                 optionExists = true;
                                                 select.selectedIndex = i;
-                                                console.log('Found existing preview option at index', i);
                                                 break;
                                             }
                                         }
 
                                         if (!optionExists) {
-                                            console.log('Adding new preview option to select');
                                             const newOption = document.createElement('option');
                                             newOption.value = data.page_id;
                                             newOption.text = data.page_title || 'Preview Portofolio';
                                             newOption.selected = true;
                                             select.appendChild(newOption);
-                                            console.log('New preview option added and selected');
 
                                             // Trigger change event to notify WordPress
                                             const changeEvent = new Event('change', {
                                                 bubbles: true
                                             });
                                             select.dispatchEvent(changeEvent);
-                                            console.log('Preview change event dispatched');
                                         }
                                     } else {
                                         console.error('Preview select element not found');

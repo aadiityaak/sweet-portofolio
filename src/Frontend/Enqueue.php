@@ -55,11 +55,9 @@ class Enqueue {
             <script>
             // Ensure Alpine.js is properly loaded
             window.addEventListener('load', function() {
-                console.log('Page loaded, checking Alpine.js availability...');
 
                 // Check if Alpine is available after page load
                 if (typeof window.Alpine !== 'undefined') {
-                    console.log('Alpine.js already available on frontend');
                     return;
                 }
 
@@ -69,22 +67,10 @@ class Enqueue {
                 var script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js';
                 script.defer = true;
-                script.onload = function() {
-                    console.log('Alpine.js loaded successfully via fallback');
-                    // Trigger Alpine initialization if needed
-                    if (typeof window.Alpine !== 'undefined') {
-                        console.log('Alpine.js initialized after manual load');
-                    }
-                };
                 script.onerror = function() {
                     console.error('Failed to load Alpine.js via fallback');
                 };
                 document.head.appendChild(script);
-            });
-
-            // Listen for Alpine.js initialization
-            document.addEventListener('alpine:init', function() {
-                console.log('Alpine.js initialized successfully on frontend');
             });
             </script>
             <?php
