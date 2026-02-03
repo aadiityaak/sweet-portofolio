@@ -98,6 +98,7 @@ function sweet_portofolio_render_portofolio_list_shortcode($atts = array())
     if (!empty($atts['category'])) {
         $shortcode_category = sanitize_text_field($atts['category']);
     }
+    $shortcode_title = 'yes';
 
     ob_start();
     if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
@@ -111,6 +112,38 @@ function sweet_portofolio_render_portofolio_list_shortcode($atts = array())
     return ob_get_clean();
 }
 add_shortcode('portofolio_list', 'sweet_portofolio_render_portofolio_list_shortcode');
+
+function sweet_portofolio_list_shortcode($atts = array())
+{
+    $atts = shortcode_atts(array(
+        'default' => '',
+        'include' => '',
+        'title' => 'yes',
+        'filter' => 'yes'
+    ), $atts, 'sweet-portofolio-list');
+
+    $shortcode_ids = array();
+    if (!empty($atts['include'])) {
+        $shortcode_ids = array_filter(array_map('intval', array_map('trim', explode(',', $atts['include']))));
+    }
+    $shortcode_category = '';
+    if (!empty($atts['default'])) {
+        $shortcode_category = sanitize_text_field($atts['default']);
+    }
+    $shortcode_title = sanitize_text_field($atts['title']);
+
+    ob_start();
+    if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
+        define('SWEETPORTOFOLIO_SHORTCODE', true);
+    }
+    wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/style.css', array(), SWEETPORTOFOLIO_VERSION);
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), SWEETPORTOFOLIO_VERSION, true);
+    wp_enqueue_script('sweet-alpine-js-frontend', 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
+    include plugin_dir_path(__FILE__) . 'inc/page-portfolio-list.php';
+    return ob_get_clean();
+}
+add_shortcode('sweet-portofolio-list', 'sweet_portofolio_list_shortcode');
 
 // Activation hook
 register_activation_hook(__FILE__, 'sweet_portofolio_activate');

@@ -453,7 +453,7 @@ if (!$categories_data) {
             <div x-data="portfolioGrid(
                     <?php echo $current_page; ?>,
                     '<?php echo $jenis_web; ?>',
-                    'yes',
+                    '<?php echo isset($shortcode_title) ? $shortcode_title : 'yes'; ?>',
                     '<?php echo $style_thumbnail; ?>',
                     '<?php echo !empty($preview_page) ? get_the_permalink($preview_page) : ''; ?>',
                     '<?php echo $whatsapp_number; ?>',
@@ -474,26 +474,25 @@ if (!$categories_data) {
                 ?>
                 )">
                 <!-- Filter Form with Alpine.js -->
-                <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes';
-                if ($filter_attr !== 'no') : ?>
-                    <div class="filter-section">
-                        <div class="filter-row">
-                            <div class="filter-group">
-                                <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="filter-select">
-                                    <option value="">All Categories</option>
-                                    <?php
-                                    if (is_array($categories_data) && !empty($portofolio_selection)) {
-                                        foreach ($categories_data as $category) {
-                                            if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
-                                                echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
-                                            }
+                <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes'; if ($filter_attr !== 'no') : ?>
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="filter-select">
+                                <option value="">All Categories</option>
+                                <?php
+                                if (is_array($categories_data) && !empty($portofolio_selection)) {
+                                    foreach ($categories_data as $category) {
+                                        if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
+                                            echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
                                         }
                                     }
-                                    ?>
-                                </select>
-                            </div>
+                                }
+                                ?>
+                            </select>
                         </div>
                     </div>
+                </div>
                 <?php endif; ?>
 
                 <div class="frame-portofolio">
