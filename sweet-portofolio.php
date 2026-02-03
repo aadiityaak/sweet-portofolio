@@ -1,5 +1,4 @@
 <?php
-
 /**
  * sweet-portofolio
  *
@@ -18,9 +17,6 @@
  * Text Domain:   sweet-portofolio
  * License:       GPLv2
  * License URI:   https://www.gnu.org/licenses/gpl-2.0.html
- *
- * You should have received a copy of the GNU General Public License
- * along with sweet-portofolio. If not, see <https://www.gnu.org/licenses/gpl-2.0.html/>.
  */
 
 // Exit if accessed directly.
@@ -28,8 +24,6 @@ if (! defined('ABSPATH')) exit;
 
 /**
  * Currently plugin version.
- * Start at version 1.0.0 and use SemVer - https://semver.org
- * Rename this for your plugin and update it as you release new versions.
  */
 define('SWEETPORTOFOLIO_VERSION', '1.0.613');
 
@@ -38,42 +32,45 @@ define('SWEETPORTOFOLIO_VERSION', '1.0.613');
  */
 define('SWEETPORTOFOLIO_URL', plugin_dir_url(__FILE__));
 
-$files = array(
-    'inc/enqueue.php',
-    'inc/sweet-options.php',
-    'inc/rest-api.php',
-);
-foreach ($files as $file) {
-    require_once plugin_dir_path(__FILE__) . $file;
-}
+/**
+ * Define plugin path
+ */
+define('SWEETPORTOFOLIO_PATH', plugin_dir_path(__FILE__));
 
-//Load template from specific page
-add_filter('page_template', 'wpa3396_page_template');
-function wpa3396_page_template($page_template)
-{
-
-    if (get_page_template_slug() == 'page-preview.php') {
-        $page_template = dirname(__FILE__) . '/inc/page-preview.php';
+/**
+ * Register Autoloader
+ */
+spl_autoload_register(function ($class) {
+    $prefix = 'SweetPortofolio\\';
+    $base_dir = plugin_dir_path(__FILE__) . 'src/';
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
     }
-
-    if (get_page_template_slug() == 'page-portfolio-list.php') {
-        $page_template = dirname(__FILE__) . '/inc/page-portfolio-list.php';
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    if (file_exists($file)) {
+        require $file;
     }
+});
 
-    return $page_template;
+/**
+ * Activation Hook
+ */
+register_activation_hook(__FILE__, ['SweetPortofolio\Core\Activator', 'activate']);
+
+/**
+ * Initialize the plugin
+ */
+function run_sweet_portofolio() {
+    $plugin = new SweetPortofolio\Core\Plugin();
+    $plugin->run();
 }
+run_sweet_portofolio();
 
-add_filter('theme_page_templates', 'wpse_288589_add_template_to_select', 10, 4);
-function wpse_288589_add_template_to_select($post_templates, $wp_theme, $post, $post_type)
-{
-
-    // Add custom template named template-custom.php to select dropdown 
-    $post_templates['page-preview.php'] = __('Preview Portofolio');
-    $post_templates['page-portfolio-list.php'] = __('Portfolio List');
-
-    return $post_templates;
-}
-
+/**
+ * Initialize session if not started
+ */
 function sweet_portofolio_init()
 {
     if (!session_id()) {
@@ -81,114 +78,3 @@ function sweet_portofolio_init()
     }
 }
 add_action('init', 'sweet_portofolio_init');
-
-function sweet_portofolio_render_portofolio_list_shortcode($atts = array())
-{
-    $atts = shortcode_atts(array(
-        'ids' => '',
-        'filter' => 'yes',
-        'category' => ''
-    ), $atts, 'portofolio_list');
-
-    $shortcode_ids = array();
-    if (!empty($atts['ids'])) {
-        $shortcode_ids = array_filter(array_map('intval', array_map('trim', explode(',', $atts['ids']))));
-    }
-    $shortcode_category = '';
-    if (!empty($atts['category'])) {
-        $shortcode_category = sanitize_text_field($atts['category']);
-    }
-    $shortcode_title = 'yes';
-
-    ob_start();
-    if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
-        define('SWEETPORTOFOLIO_SHORTCODE', true);
-    }
-    wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/style.css', array(), SWEETPORTOFOLIO_VERSION);
-    wp_enqueue_script('jquery');
-    wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), SWEETPORTOFOLIO_VERSION, true);
-    wp_enqueue_script('sweet-alpine-js-frontend', 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
-    include plugin_dir_path(__FILE__) . 'inc/page-portfolio-list.php';
-    return ob_get_clean();
-}
-add_shortcode('portofolio_list', 'sweet_portofolio_render_portofolio_list_shortcode');
-
-function sweet_portofolio_list_shortcode($atts = array())
-{
-    $atts = shortcode_atts(array(
-        'default' => '',
-        'include' => '',
-        'title' => 'yes',
-        'filter' => 'yes'
-    ), $atts, 'sweet-portofolio-list');
-
-    $shortcode_ids = array();
-    if (!empty($atts['include'])) {
-        $shortcode_ids = array_filter(array_map('intval', array_map('trim', explode(',', $atts['include']))));
-    }
-    $shortcode_category = '';
-    if (!empty($atts['default'])) {
-        $shortcode_category = sanitize_text_field($atts['default']);
-    }
-    $shortcode_title = sanitize_text_field($atts['title']);
-
-    ob_start();
-    if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
-        define('SWEETPORTOFOLIO_SHORTCODE', true);
-    }
-    wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/style.css', array(), SWEETPORTOFOLIO_VERSION);
-    wp_enqueue_script('jquery');
-    wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), SWEETPORTOFOLIO_VERSION, true);
-    wp_enqueue_script('sweet-alpine-js-frontend', 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
-    include plugin_dir_path(__FILE__) . 'inc/page-portfolio-list.php';
-    return ob_get_clean();
-}
-add_shortcode('sweet-portofolio-list', 'sweet_portofolio_list_shortcode');
-
-// Activation hook
-register_activation_hook(__FILE__, 'sweet_portofolio_activate');
-
-function sweet_portofolio_activate()
-{
-    // Check if pages already exist
-    $portfolio_page_id = get_option('portofolio_page');
-    $preview_page_id = get_option('portofolio_preview_page');
-
-    // Create portfolio page if it doesn't exist
-    if (!$portfolio_page_id || $portfolio_page_id == '-1' || !get_post($portfolio_page_id)) {
-        $portfolio_page = array(
-            'post_title'    => 'Portofolio',
-            'post_content'  => '',
-            'post_status'   => 'publish',
-            'post_author'   => 1,
-            'post_type'     => 'page',
-            'post_name'     => 'portofolio'
-        );
-
-        $new_portfolio_page_id = wp_insert_post($portfolio_page);
-
-        if ($new_portfolio_page_id && !is_wp_error($new_portfolio_page_id)) {
-            update_option('portofolio_page', $new_portfolio_page_id);
-            update_post_meta($new_portfolio_page_id, '_wp_page_template', 'page-portfolio-list.php');
-        }
-    }
-
-    // Create preview page if it doesn't exist
-    if (!$preview_page_id || $preview_page_id == '-1' || !get_post($preview_page_id)) {
-        $preview_page = array(
-            'post_title'    => 'Preview Portofolio',
-            'post_content'  => '',
-            'post_status'   => 'publish',
-            'post_author'   => 1,
-            'post_type'     => 'page',
-            'post_name'     => 'preview-portofolio'
-        );
-
-        $new_preview_page_id = wp_insert_post($preview_page);
-
-        if ($new_preview_page_id && !is_wp_error($new_preview_page_id)) {
-            update_option('portofolio_preview_page', $new_preview_page_id);
-            update_post_meta($new_preview_page_id, '_wp_page_template', 'page-preview.php');
-        }
-    }
-}
