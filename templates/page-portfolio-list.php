@@ -218,7 +218,7 @@ if (!$categories_data) {
                                     <h3 x-show="showTitle !== 'no'" class="card-title">
                                         <a :href="getPreviewUrl(item)" x-text="item.title" class="card-title-link"></a>
                                     </h3>
-                                    <p x-show="item.excerpt" class="card-excerpt" x-text="item.excerpt"></p>
+                                    <p x-show="item.excerpt" class="card-excerpt" x-html="item.excerpt"></p>
                                 </div>
                             </div>
                         </div>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * sweet-portofolio
  *
@@ -11,7 +12,7 @@
  * Plugin Name:   Sweet Portofolio
  * Plugin URI:    Portofolio Website Simple untuk mitra websweetstudio.com
  * Description:   Plugin untuk web utama
- * Version:       1.1.0
+ * Version:       1.1.2
  * Author:        Aditya K
  * Author URI:    https://websweetstudio.com
  * Text Domain:   sweet-portofolio
@@ -62,7 +63,8 @@ register_activation_hook(__FILE__, ['SweetPortofolio\Core\Activator', 'activate'
 /**
  * Initialize the plugin
  */
-function run_sweet_portofolio() {
+function run_sweet_portofolio()
+{
     $plugin = new SweetPortofolio\Core\Plugin();
     $plugin->run();
 }
