@@ -7,6 +7,21 @@ class Settings
     public function register()
     {
         add_action('admin_menu', [$this, 'add_menu_page']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
+    }
+
+    public function enqueue_admin_assets($hook)
+    {
+        if ($hook !== 'toplevel_page_portofolio-settings') {
+            return;
+        }
+
+        wp_enqueue_style(
+            'sweet-portofolio-admin',
+            SWEETPORTOFOLIO_URL . 'assets/css/admin.css',
+            [],
+            SWEETPORTOFOLIO_VERSION
+        );
     }
 
     public function add_menu_page()
@@ -81,398 +96,8 @@ class Settings
         }
 
         // Add modern CSS for layout
-        echo '<style>
-        /* Modern Card-based Layout */
-        .sweet-portofolio-settings {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        
-        .sweet-portofolio-header {
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sweet-portofolio-header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
-        }
-        
-        .sweet-portofolio-header p {
-            margin: 10px 0 0;
-            opacity: 0.9;
-            font-size: 16px;
-        }
-        
-        .sweet-portofolio-actions {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .sweet-portofolio-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
-        }
-        
-        .sweet-portofolio-card:hover {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .sweet-portofolio-card h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 20px;
-            color: #1f2937;
-            border-bottom: 2px solid #f3f4f6;
-            padding-bottom: 10px;
-        }
-        
-        .sweet-portofolio-form-row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -10px;
-        }
-        
-        .sweet-portofolio-form-col {
-            padding: 0 10px;
-            flex: 1;
-            min-width: 250px;
-        }
-        
-        .sweet-portofolio-form-group {
-            margin-bottom: 20px;
-        }
-        
-        .sweet-portofolio-form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #374151;
-        }
-        
-        .sweet-portofolio-form-group input[type="text"],
-        .sweet-portofolio-form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-        
-        .sweet-portofolio-form-group input[type="text"]:focus,
-        .sweet-portofolio-form-group select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .sweet-portofolio-form-group .description {
-            font-size: 13px;
-            color: #6b7280;
-            margin-top: 5px;
-        }
-        
-        .sweet-portofolio-button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .sweet-portofolio-button {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-size: 14px;
-        }
-        
-        .sweet-portofolio-button-primary {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .sweet-portofolio-button-primary:hover {
-            background: #2563eb;
-        }
-        
-        .sweet-portofolio-button-secondary {
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
-        }
-        
-        .sweet-portofolio-button-secondary:hover {
-            background: #e5e7eb;
-        }
-        
-        .sweet-portofolio-checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        
-        .sweet-portofolio-checkbox-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            background: #f9fafb;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s;
-        }
-        
-        .sweet-portofolio-checkbox-item:hover {
-            background: #f3f4f6;
-        }
-        
-        .sweet-portofolio-checkbox-item input[type="checkbox"] {
-            margin-right: 10px;
-        }
-        
-        .sweet-portofolio-status {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .sweet-portofolio-status-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .sweet-portofolio-status-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .sweet-portofolio-notice {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .sweet-portofolio-notice-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-        
-        .sweet-portofolio-notice-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
-        }
-        
-        .sweet-portofolio-submit {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 16px;
-        }
-        
-        .sweet-portofolio-submit:hover {
-            background: #2563eb;
-        }
-        
-        .sweet-portofolio-help-text {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            font-size: 13px;
-            color: #0c4a6e;
-        }
-        
-        /* Additional styles for new elements */
-        .sweet-portofolio-card-title {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 20px;
-            color: #1f2937;
-            border-bottom: 2px solid #f3f4f6;
-            padding-bottom: 10px;
-        }
-        
-        .sweet-portofolio-form-section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        
-        .sweet-portofolio-form-section:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .sweet-portofolio-section-title {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: #4b5563;
-            font-weight: 600;
-        }
-        
-        .sweet-portofolio-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #374151;
-        }
-        
-        .sweet-portofolio-input,
-        .sweet-portofolio-select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            background-color: #ffffff;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-        }
-        
-        .sweet-portofolio-input:focus,
-        .sweet-portofolio-select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            background-color: #ffffff;
-        }
-        
-        .sweet-portofolio-input::placeholder {
-            color: #9ca3af;
-        }
-        
-        .sweet-portofolio-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20fill%3D%27%236b7280%27%20d%3D%27M7%2010l5%205%205-5z%27%2F%3E%3C%2Fsvg%3E");
-            background-position: right 10px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 40px;
-        }
-        
-        .sweet-portofolio-select:hover {
-            border-color: #9ca3af;
-        }
-        
-        /* Style for WordPress dropdown pages */
-        #portofolio_page_select,
-        #portofolio_preview_page_select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            background-color: #ffffff;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20fill%3D%27%236b7280%27%20d%3D%27M7%2010l5%205%205-5z%27%2F%3E%3C%2Fsvg%3E");
-            background-position: right 10px center;
-            background-repeat: no-repeat;
-            background-size: 16px;
-            padding-right: 40px;
-        }
-        
-        #portofolio_page_select:focus,
-        #portofolio_preview_page_select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            background-color: #ffffff;
-        }
-        
-        #portofolio_page_select:hover,
-        #portofolio_preview_page_select:hover {
-            border-color: #9ca3af;
-        }
-        
-        .sweet-portofolio-checkbox-label {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            background: #f9fafb;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        
-        .sweet-portofolio-checkbox-label:hover {
-            background: #f3f4f6;
-            border-color: #d1d5db;
-        }
-        
-        .sweet-portofolio-checkbox {
-            margin-right: 10px;
-            width: 16px;
-            height: 16px;
-            accent-color: #3b82f6;
-            cursor: pointer;
-        }
-        
-        .sweet-portofolio-checkbox-text {
-            font-size: 14px;
-            color: #374151;
-        }
-        
-        .sweet-portofolio-form-actions {
-            margin-top: 30px;
-            text-align: right;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .sweet-portofolio-form-row {
-                flex-direction: column;
-            }
-            
-            .sweet-portofolio-form-col {
-                margin-bottom: 15px;
-            }
-            
-            .sweet-portofolio-actions {
-                flex-direction: column;
-            }
-            
-            .sweet-portofolio-button-group {
-                flex-direction: column;
-            }
-            
-            .sweet-portofolio-form-actions {
-                text-align: center;
-            }
-        }
-        </style>';
-        ?>
+        // Styles are now enqueued from assets/css/admin.css
+?>
         <div class="wrap sweet-portofolio-settings">
             <div class="sweet-portofolio-header">
                 <h1>Sweet Portofolio Settings</h1>
@@ -492,9 +117,12 @@ class Settings
             <?php endif; ?>
 
             <div class="sweet-portofolio-actions">
-                <a href="<?php echo admin_url('admin.php?page=portofolio-settings&cache-cleared=true'); ?>" class="sweet-portofolio-button sweet-portofolio-button-secondary">Clear Cache</a>
+                <a href="<?php echo admin_url('admin.php?page=portofolio-settings&cache-cleared=true'); ?>" class="sweet-portofolio-button sweet-portofolio-button-white">Clear Cache</a>
                 <a href="<?php echo admin_url('admin.php?page=portofolio-settings&refresh-data=true'); ?>" class="sweet-portofolio-button sweet-portofolio-button-primary">Refresh Portfolio Data</a>
-                <a href="<?php echo admin_url('admin.php?page=portofolio-settings&generate-pages=true'); ?>" class="sweet-portofolio-button sweet-portofolio-button-secondary">Generate Pages</a>
+                <a href="<?php echo admin_url('admin.php?page=portofolio-settings&generate-pages=true'); ?>" class="sweet-portofolio-button sweet-portofolio-button-white">Generate Pages</a>
+            </div>
+
+            <div class="sweet-portofolio-notices-area">
                 <?php
                 if (isset($_GET['cache-cleared']) && $_GET['cache-cleared'] == 'true') {
                     delete_transient('web_data_transient');
@@ -954,7 +582,7 @@ class Settings
                             this.messageType = 'error';
                         } finally {
                             this.generating = false;
-                            
+
                             // Clear message after 5 seconds
                             setTimeout(() => {
                                 this.message = '';
@@ -974,7 +602,7 @@ class Settings
                 }));
             });
         </script>
-        <?php
+<?php
     }
 
     private function portofolio_generate_pages()

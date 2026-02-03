@@ -20,7 +20,7 @@ class Enqueue {
      * Enqueue styles and scripts
      */
     public function enqueue_styles() {
-        wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/style.css', array(), SWEETPORTOFOLIO_VERSION);
+        wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/frontend.css', array(), SWEETPORTOFOLIO_VERSION);
         wp_enqueue_script('jquery');
 
         // Load portfolio script normally for all pages

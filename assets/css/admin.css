@@ -1,0 +1,307 @@
+        /* Modern Flat Layout (Tailwind-like) */
+        .sweet-portofolio-settings {
+            max-width: 1000px;
+            margin: 0 auto;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1f2937;
+        }
+        
+        .sweet-portofolio-header {
+            padding: 24px;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        
+        .sweet-portofolio-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+        }
+        
+        .sweet-portofolio-header p {
+            margin: 8px 0 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .sweet-portofolio-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .sweet-portofolio-card {
+            background: #fff;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .sweet-portofolio-card h2 {
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .sweet-portofolio-form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -12px;
+        }
+        
+        .sweet-portofolio-form-col {
+            padding: 0 12px;
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 20px;
+        }
+        
+        .sweet-portofolio-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+        
+        /* Unified Input Styling */
+        .sweet-portofolio-input,
+        .sweet-portofolio-select,
+        #portofolio_page_select,
+        #portofolio_preview_page_select {
+            display: block;
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #111827;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #d1d5db;
+            border-radius: 0;
+            box-shadow: none;
+            transition: none;
+            box-sizing: border-box;
+            height: 44px; /* Consistent height */
+        }
+        
+        /* Focus States */
+        .sweet-portofolio-input:focus,
+        .sweet-portofolio-select:focus,
+        #portofolio_page_select:focus,
+        #portofolio_preview_page_select:focus {
+            color: #111827;
+            background-color: #fff;
+            border-color: #2563eb;
+            outline: 1px solid #2563eb;
+            box-shadow: none;
+        }
+        
+        /* Select Specifics (Arrow) */
+        .sweet-portofolio-select,
+        #portofolio_page_select,
+        #portofolio_preview_page_select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20fill%3D%27none%27%20viewBox%3D%270%200%2024%2024%27%20stroke-width%3D%271.5%27%20stroke%3D%27%236b7280%27%3E%3Cpath%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20d%3D%27M19.5%208.25l-7.5%207.5-7.5-7.5%27%20%2F%3E%3C%2Fsvg%3E");
+            background-position: right 14px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 44px;
+        }
+
+        .sweet-portofolio-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            height: 44px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-radius: 0;
+            text-decoration: none;
+            line-height: 1;
+            transition: none;
+            box-sizing: border-box;
+        }
+        
+        .sweet-portofolio-button-primary {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        
+        .sweet-portofolio-button-primary:hover {
+            background-color: #1d4ed8;
+            color: #ffffff;
+        }
+        
+        .sweet-portofolio-button-white {
+            background-color: #ffffff;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+        
+        .sweet-portofolio-button-white:hover {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+            color: #1f2937;
+        }
+
+        .sweet-portofolio-button:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2563eb;
+        }
+        
+        .sweet-portofolio-checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .sweet-portofolio-checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .sweet-portofolio-checkbox-item:hover {
+            border-color: #d1d5db;
+        }
+        
+        .sweet-portofolio-checkbox-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            margin-right: 12px;
+            border-radius: 0;
+            width: 18px;
+            height: 18px;
+            border: 1px solid #d1d5db;
+            background-color: #fff;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .sweet-portofolio-checkbox-item input[type="checkbox"]:checked {
+            background-color: #2563eb;
+            border-color: #2563eb;
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            background-size: 12px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .sweet-portofolio-checkbox-item input[type="checkbox"]:focus {
+            outline: 1px solid #2563eb;
+            outline-offset: 1px;
+        }
+        
+        .sweet-portofolio-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+        
+        .sweet-portofolio-status-success {
+            background-color: #ecfdf5;
+            color: #047857;
+        }
+        
+        .sweet-portofolio-status-error {
+            background-color: #fef2f2;
+            color: #b91c1c;
+        }
+        
+        .sweet-portofolio-notice {
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            border: 1px solid transparent;
+            font-size: 14px;
+        }
+        
+        .sweet-portofolio-notice-success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+        
+        .sweet-portofolio-notice-error {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+        
+        .sweet-portofolio-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 0 24px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 0;
+            transition: none;
+        }
+        
+        .sweet-portofolio-submit:hover {
+            background-color: #1d4ed8;
+        }
+
+        .sweet-portofolio-submit:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2563eb;
+        }
+        
+        .sweet-portofolio-help-text {
+            margin-top: 6px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .sweet-portofolio-form-actions {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+            text-align: right;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sweet-portofolio-form-row {
+                flex-direction: column;
+                margin: 0;
+            }
+            
+            .sweet-portofolio-form-col {
+                padding: 0;
+                margin-bottom: 16px;
+            }
+            
+            .sweet-portofolio-actions {
+                flex-direction: column;
+            }
+            
+            .sweet-portofolio-form-actions {
+                text-align: left;
+            }
+        }
