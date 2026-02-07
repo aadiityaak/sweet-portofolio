@@ -95,7 +95,8 @@ class Shortcode
         wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/frontend.css', array(), SWEETPORTOFOLIO_VERSION);
         wp_enqueue_script('jquery');
         wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), SWEETPORTOFOLIO_VERSION, true);
-        wp_enqueue_script('sweet-alpine-js-frontend', 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
+        // Load Alpine.js from unpkg and add optimizer exclusions via script_loader_tag in Enqueue
+        wp_enqueue_script('sweet-alpine-js-frontend', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
 
         // Include template
         $template_path = SWEETPORTOFOLIO_PATH . 'templates/page-portfolio-list.php';

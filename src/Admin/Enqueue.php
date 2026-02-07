@@ -26,19 +26,32 @@ class Enqueue {
             // Enqueue WordPress API script
             wp_enqueue_script('wp-api');
 
-            // Add Alpine.js CDN with defer attribute - use unique handle for admin
-            wp_enqueue_script( 'sweet-alpine-js-admin', 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', false );
+            // Add Alpine.js CDN with defer attribute - use unpkg to reduce truncation issues
+            wp_enqueue_script( 'sweet-alpine-js-admin', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', false );
 
             // Debug: Log that scripts are being enqueued
             error_log('Enqueueing wp-api and alpine-js scripts for portofolio-settings page');
 
-            // Add defer attribute to Alpine.js script
+            // Add defer and data-no-optimize to Alpine.js script to avoid cache optimizer modifications
             add_filter('script_loader_tag', function($tag, $handle, $src) {
                 if ($handle === 'sweet-alpine-js-admin') {
-                    return str_replace(' src', ' defer src', $tag);
+                    $tag = str_replace(' src', ' defer data-no-optimize="1" src', $tag);
+                    return $tag;
                 }
                 return $tag;
             }, 10, 3);
+
+            // WP Rocket exclusions (safe even if plugin not active)
+            add_filter('rocket_delay_js_exclusions', function ($excluded) {
+                $excluded[] = 'sweet-alpine-js-admin';
+                $excluded[] = 'alpinejs@3.13.3/dist/cdn.min.js';
+                return array_unique($excluded);
+            });
+            add_filter('rocket_exclude_defer_js', function ($excluded) {
+                $excluded[] = 'sweet-alpine-js-admin';
+                $excluded[] = 'alpinejs@3.13.3/dist/cdn.min.js';
+                return array_unique($excluded);
+            });
 
             // Localize script with REST API nonce
             wp_localize_script('sweet-alpine-js-admin', 'wpApiSettings', array(
