@@ -94,9 +94,21 @@ class Shortcode
         // Ensure assets are loaded
         wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/frontend.css', array(), SWEETPORTOFOLIO_VERSION);
         wp_enqueue_script('jquery');
-        wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), SWEETPORTOFOLIO_VERSION, true);
+
+        // Use minified script if not in debug mode
+        $js_ext = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '.js' : '.min.js';
+        $js_path = 'assets/js/script' . $js_ext;
+
+        // Fallback to non-minified if minified doesn't exist
+        if (!file_exists(SWEETPORTOFOLIO_PATH . $js_path)) {
+            $js_path = 'assets/js/script.js';
+        }
+
+        wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . $js_path, array('jquery'), SWEETPORTOFOLIO_VERSION, true);
         // Load Alpine.js from unpkg and add optimizer exclusions via script_loader_tag in Enqueue
-        wp_enqueue_script('sweet-alpine-js-frontend', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
+        if (!wp_script_is('sweet-alpine-js-frontend', 'enqueued') && !wp_script_is('sweet-alpine-js-frontend', 'registered')) {
+            wp_enqueue_script('sweet-alpine-js-frontend', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
+        }
 
         // Include template
         $template_path = SWEETPORTOFOLIO_PATH . 'templates/page-portfolio-list.php';

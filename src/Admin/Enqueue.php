@@ -1,4 +1,5 @@
 <?php
+
 namespace SweetPortofolio\Admin;
 
 /**
@@ -6,12 +7,14 @@ namespace SweetPortofolio\Admin;
  * 
  * Handles admin asset enqueueing.
  */
-class Enqueue {
+class Enqueue
+{
 
     /**
      * Initialize the class.
      */
-    public function __construct() {
+    public function __construct()
+    {
         add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('admin_head', array($this, 'inline_scripts'));
     }
@@ -19,7 +22,8 @@ class Enqueue {
     /**
      * Enqueue admin scripts
      */
-    public function enqueue_scripts() {
+    public function enqueue_scripts()
+    {
         // Only load on our admin page
         $screen = get_current_screen();
         if ($screen && strpos($screen->id, 'portofolio-settings') !== false) {
@@ -27,13 +31,15 @@ class Enqueue {
             wp_enqueue_script('wp-api');
 
             // Add Alpine.js CDN with defer attribute - use unpkg to reduce truncation issues
-            wp_enqueue_script( 'sweet-alpine-js-admin', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', false );
+            if (!wp_script_is('alpinejs', 'enqueued') && !wp_script_is('alpinejs', 'registered')) {
+                wp_enqueue_script('alpinejs', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', false);
+            }
 
             // Debug: Log that scripts are being enqueued
             error_log('Enqueueing wp-api and alpine-js scripts for portofolio-settings page');
 
             // Add defer and data-no-optimize to Alpine.js script to avoid cache optimizer modifications
-            add_filter('script_loader_tag', function($tag, $handle, $src) {
+            add_filter('script_loader_tag', function ($tag, $handle, $src) {
                 if ($handle === 'sweet-alpine-js-admin') {
                     $tag = str_replace(' src', ' defer data-no-optimize="1" src', $tag);
                     return $tag;
@@ -64,19 +70,20 @@ class Enqueue {
     /**
      * Add inline scripts
      */
-    public function inline_scripts() {
+    public function inline_scripts()
+    {
         $screen = get_current_screen();
         if ($screen && strpos($screen->id, 'portofolio-settings') !== false) {
             // Debug: Log that inline scripts are being added
             error_log('Adding inline scripts for wpApiSettings');
-            ?>
+?>
             <script>
-            // Make sure wpApiSettings is available
-            window.wpApiSettings = window.wpApiSettings || {};
-            window.wpApiSettings.nonce = '<?php echo wp_create_nonce('wp_rest'); ?>';
-            window.wpApiSettings.root = '<?php echo esc_url_raw(rest_url()); ?>';
+                // Make sure wpApiSettings is available
+                window.wpApiSettings = window.wpApiSettings || {};
+                window.wpApiSettings.nonce = '<?php echo wp_create_nonce('wp_rest'); ?>';
+                window.wpApiSettings.root = '<?php echo esc_url_raw(rest_url()); ?>';
             </script>
-            <?php
+<?php
         }
     }
 }
