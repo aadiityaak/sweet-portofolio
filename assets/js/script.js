@@ -416,11 +416,11 @@
                 classes.push("disabled");
               }
 
-              return `<button type="button" class="${classes.join(" ")}"${
+              return `<span class="${classes.join(" ")}"${
                 isEllipsis
-                  ? ' disabled="disabled" aria-disabled="true"'
-                  : ` data-page="${page}"`
-              }>${page}</button>`;
+                  ? ' aria-disabled="true"'
+                  : ` data-page="${page}" role="button" tabindex="0"`
+              }>${page}</span>`;
             })
             .join("");
         },
@@ -432,6 +432,25 @@
             return;
           }
 
+          const page = parseInt(button.getAttribute("data-page"), 10);
+
+          if (!Number.isNaN(page)) {
+            this.goToPage(page);
+          }
+        },
+
+        handlePaginationKeydown(event) {
+          if (event.key !== "Enter" && event.key !== " ") {
+            return;
+          }
+
+          const button = event.target.closest("[data-page]");
+
+          if (!button) {
+            return;
+          }
+
+          event.preventDefault();
           const page = parseInt(button.getAttribute("data-page"), 10);
 
           if (!Number.isNaN(page)) {

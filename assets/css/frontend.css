@@ -773,6 +773,9 @@
 }
 
 .pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 42px;
   min-height: 42px;
   padding: 10px 14px;
@@ -783,6 +786,8 @@
   font-size: 14px;
   font-weight: 600;
   box-shadow: none;
+  cursor: pointer;
+  user-select: none;
 }
 
 .pagination-btn:hover:not(.disabled):not(.active) {
@@ -800,6 +805,8 @@
   background: var(--sp-surface-soft);
   color: var(--sp-muted);
   opacity: 1;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .pagination-info {

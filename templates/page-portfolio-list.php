@@ -283,15 +283,31 @@ if (!$categories_data) {
 
                 <!-- Pagination with Alpine.js -->
                 <div x-show="totalPages > 1" class="pagination" x-cloak>
-                    <button @click="goToPage(currentPage - 1)" class="pagination-btn" :class="{'disabled': currentPage === 1}" :disabled="currentPage === 1" aria-label="Previous">
+                    <span
+                        @click="if (currentPage > 1) goToPage(currentPage - 1)"
+                        @keydown.enter.prevent="if (currentPage > 1) goToPage(currentPage - 1)"
+                        @keydown.space.prevent="if (currentPage > 1) goToPage(currentPage - 1)"
+                        class="pagination-btn"
+                        :class="{'disabled': currentPage === 1}"
+                        :tabindex="currentPage === 1 ? -1 : 0"
+                        role="button"
+                        aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
-                    </button>
+                    </span>
 
-                    <div class="pagination-pages" @click="handlePaginationClick($event)" x-html="renderPaginationButtons()"></div>
+                    <div class="pagination-pages" @click="handlePaginationClick($event)" @keydown="handlePaginationKeydown($event)" x-html="renderPaginationButtons()"></div>
 
-                    <button @click="goToPage(currentPage + 1)" class="pagination-btn" :class="{'disabled': currentPage === totalPages}" :disabled="currentPage === totalPages" aria-label="Next">
+                    <span
+                        @click="if (currentPage < totalPages) goToPage(currentPage + 1)"
+                        @keydown.enter.prevent="if (currentPage < totalPages) goToPage(currentPage + 1)"
+                        @keydown.space.prevent="if (currentPage < totalPages) goToPage(currentPage + 1)"
+                        class="pagination-btn"
+                        :class="{'disabled': currentPage === totalPages}"
+                        :tabindex="currentPage === totalPages ? -1 : 0"
+                        role="button"
+                        aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
-                    </button>
+                    </span>
                 </div>
 
                 <div class="pagination-info" x-show="totalPages > 1" x-cloak>
