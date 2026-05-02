@@ -9,6 +9,32 @@ namespace SweetPortofolio\Frontend;
  */
 class Enqueue
 {
+    /**
+     * Check whether Alpine.js is already present via a known script handle.
+     *
+     * @return bool
+     */
+    private function has_alpine_script()
+    {
+        $handles = array(
+            'sweet-alpine-js-frontend',
+            'sweet-alpine-js-admin',
+            'alpinejs',
+            'alpine-js',
+        );
+
+        foreach ($handles as $handle) {
+            if (
+                wp_script_is($handle, 'registered') ||
+                wp_script_is($handle, 'enqueued') ||
+                wp_script_is($handle, 'done')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Initialize the class.
@@ -72,12 +98,8 @@ class Enqueue
 
         // Only load Alpine.js on portfolio list page or when needed
         if (is_page_template('page-portfolio-list.php') || get_query_var('pagename') === 'portfolio') {
-            // Remove any existing Alpine.js to prevent conflicts
-            wp_dequeue_script('alpine-js');
-            wp_dequeue_script('sweet-alpine-js-admin');
-
-            // Add Alpine.js to footer with proper dependencies (use unpkg to avoid CDN truncation issues)
-            if (!wp_script_is('sweet-alpine-js-frontend', 'enqueued') && !wp_script_is('sweet-alpine-js-frontend', 'registered')) {
+            // Skip enqueue if Alpine.js has already been loaded by the theme or another plugin.
+            if (!$this->has_alpine_script()) {
                 wp_enqueue_script('sweet-alpine-js-frontend', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
             }
         }
@@ -95,8 +117,11 @@ class Enqueue
                 // Ensure Alpine.js is properly loaded
                 window.addEventListener('load', function() {
 
-                    // Check if Alpine is available after page load
-                    if (typeof window.Alpine !== 'undefined') {
+                    // Skip fallback when Alpine is already available or another Alpine script tag exists.
+                    if (
+                        typeof window.Alpine !== 'undefined' ||
+                        document.querySelector('script[src*="alpinejs"]')
+                    ) {
                         return;
                     }
 

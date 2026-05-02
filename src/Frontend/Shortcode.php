@@ -9,6 +9,33 @@ namespace SweetPortofolio\Frontend;
  */
 class Shortcode
 {
+    /**
+     * Check whether Alpine.js is already present via a known script handle.
+     *
+     * @return bool
+     */
+    private function has_alpine_script()
+    {
+        $handles = array(
+            'sweet-alpine-js-frontend',
+            'sweet-alpine-js-admin',
+            'alpinejs',
+            'alpine-js',
+        );
+
+        foreach ($handles as $handle) {
+            if (
+                wp_script_is($handle, 'registered') ||
+                wp_script_is($handle, 'enqueued') ||
+                wp_script_is($handle, 'done')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Initialize the class.
@@ -105,8 +132,8 @@ class Shortcode
         }
 
         wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . $js_path, array('jquery'), SWEETPORTOFOLIO_VERSION, true);
-        // Load Alpine.js from unpkg and add optimizer exclusions via script_loader_tag in Enqueue
-        if (!wp_script_is('sweet-alpine-js-frontend', 'enqueued') && !wp_script_is('sweet-alpine-js-frontend', 'registered')) {
+        // Load Alpine.js only when it has not already been loaded by the theme or another plugin.
+        if (!$this->has_alpine_script()) {
             wp_enqueue_script('sweet-alpine-js-frontend', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
         }
 

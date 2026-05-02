@@ -232,8 +232,14 @@ if (!$categories_data) {
                         <span aria-hidden="true">&laquo;</span>
                     </button>
 
-                    <template x-for="page in getVisiblePages()" :key="'page-' + page">
-                        <button @click="goToPage(page)" class="pagination-btn" :class="{'active': page === currentPage}" x-text="page"></button>
+                    <template x-for="(page, index) in getVisiblePages()" :key="'page-' + index + '-' + page">
+                        <button
+                            @click="if (page !== '...') goToPage(page)"
+                            type="button"
+                            class="pagination-btn"
+                            :class="{'active': page === currentPage, 'disabled': page === '...'}"
+                            :disabled="page === '...'"
+                            x-text="page"></button>
                     </template>
 
                     <button @click="goToPage(currentPage + 1)" class="pagination-btn" :class="{'disabled': currentPage === totalPages}" :disabled="currentPage === totalPages" aria-label="Next">
