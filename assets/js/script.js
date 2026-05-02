@@ -400,6 +400,44 @@
 
           return rangeWithDots;
         },
+
+        renderPaginationButtons() {
+          return this.getVisiblePages()
+            .map((page) => {
+              const isEllipsis = page === "...";
+              const isActive = page === this.currentPage;
+              const classes = ["pagination-btn"];
+
+              if (isActive) {
+                classes.push("active");
+              }
+
+              if (isEllipsis) {
+                classes.push("disabled");
+              }
+
+              return `<button type="button" class="${classes.join(" ")}"${
+                isEllipsis
+                  ? ' disabled="disabled" aria-disabled="true"'
+                  : ` data-page="${page}"`
+              }>${page}</button>`;
+            })
+            .join("");
+        },
+
+        handlePaginationClick(event) {
+          const button = event.target.closest("[data-page]");
+
+          if (!button) {
+            return;
+          }
+
+          const page = parseInt(button.getAttribute("data-page"), 10);
+
+          if (!Number.isNaN(page)) {
+            this.goToPage(page);
+          }
+        },
       }),
     );
   });
