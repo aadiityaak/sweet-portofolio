@@ -147,7 +147,7 @@ if (!$categories_data) {
             <script type="text/plain" id="portfolios-data"><?php echo is_array($data) ? json_encode(array_values($data), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]'; ?></script>
 
             <!-- Alpine.js portfolio component -->
-            <div x-data="portfolioGrid(
+            <div class="portfolio-shell" x-data="portfolioGrid(
                     <?php echo $current_page; ?>,
                     '<?php echo $jenis_web; ?>',
                     '<?php echo isset($shortcode_title) ? $shortcode_title : 'yes'; ?>',
@@ -170,12 +170,49 @@ if (!$categories_data) {
                 echo '[' . implode(',', array_map('intval', $shortcode_ids)) . ']';
                 ?>
                 )">
+                <section class="portfolio-hero">
+                    <div class="portfolio-hero-grid">
+                        <div class="portfolio-hero-copy">
+                            <span class="portfolio-badge">Pilihan Desain</span>
+                            <h1 class="portfolio-hero-title">Temukan pilihan desain website yang siap jadi inspirasi tampilan brand Anda.</h1>
+                            <p class="portfolio-hero-lead">
+                                Jelajahi berbagai konsep layout, gaya visual, dan arah desain website yang sudah kami kurasi
+                                untuk membantu Anda memilih tampilan yang paling sesuai dengan kebutuhan bisnis.
+                            </p>
+                            <div class="portfolio-hero-actions">
+                                <a href="#portfolio-grid" class="portfolio-btn portfolio-btn-primary">Lihat Pilihan Desain</a>
+                                <?php if (!empty($whatsapp_number)) : ?>
+                                    <a href="<?php echo esc_url('https://wa.me/' . $whatsapp_number); ?>" target="_blank" class="portfolio-btn portfolio-btn-secondary">Hubungi Kami</a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="portfolio-hero-panel">
+                            <div class="portfolio-hero-panel-inner">
+                                <span class="portfolio-panel-kicker">Design Overview</span>
+                                <h2 class="portfolio-panel-title">Kumpulan desain yang memudahkan Anda membandingkan gaya sebelum memutuskan.</h2>
+                                <div class="portfolio-stat-list">
+                                    <div class="portfolio-stat-item">
+                                        <span class="portfolio-stat-label">Jumlah desain</span>
+                                        <strong class="portfolio-stat-value" x-text="filteredPortfolios.length"></strong>
+                                    </div>
+                                    <div class="portfolio-stat-item">
+                                        <span class="portfolio-stat-label">Kategori aktif</span>
+                                        <strong class="portfolio-stat-value" x-text="selectedCategory || 'Semua kategori'"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Filter Form with Alpine.js -->
                 <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes';
                 if ($filter_attr !== 'no') : ?>
                     <div class="filter-section">
                         <div class="filter-row">
                             <div class="filter-group">
+                                <label for="category-filter" class="portfolio-filter-label">Filter kategori</label>
                                 <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="filter-select">
                                     <option value="">All Categories</option>
                                     <?php
@@ -193,7 +230,21 @@ if (!$categories_data) {
                     </div>
                 <?php endif; ?>
 
-                <div class="frame-portofolio">
+                <div class="portfolio-results-bar">
+                    <div>
+                        <span class="portfolio-results-kicker" x-text="selectedCategory || 'Semua kategori'"></span>
+                        <h2 class="portfolio-results-title">Koleksi portofolio</h2>
+                    </div>
+                    <div class="portfolio-results-summary" x-text="`${filteredPortfolios.length} item tersedia`"></div>
+                </div>
+
+                <div class="portfolio-empty-state" x-show="filteredPortfolios.length === 0" x-cloak>
+                    <span class="portfolio-badge portfolio-badge-muted">Belum ada hasil</span>
+                    <h3 class="portfolio-empty-title">Portofolio yang Anda cari belum tersedia.</h3>
+                    <p class="portfolio-empty-text">Coba pilih kategori lain atau hubungi kami untuk meminta contoh desain yang paling sesuai dengan kebutuhan bisnis Anda.</p>
+                </div>
+
+                <div class="frame-portofolio" id="portfolio-grid" x-show="filteredPortfolios.length > 0" x-cloak>
                     <template x-for="(item, index) in paginatedPortfolios" :key="'portfolio-' + (item.id || index)">
                         <div class="col-portofolio">
                             <div class="card-portofolio">
@@ -216,6 +267,10 @@ if (!$categories_data) {
                                     </div>
                                 </div>
                                 <div class="card-content">
+                                    <div class="card-meta-row">
+                                        <span class="card-meta-pill">Website Portfolio</span>
+                                        <span x-show="portofolioCredit" class="card-meta-text" x-text="portofolioCredit"></span>
+                                    </div>
                                     <h3 x-show="showTitle !== 'no'" class="card-title">
                                         <a :href="getPreviewUrl(item)" x-text="item.title" class="card-title-link"></a>
                                     </h3>

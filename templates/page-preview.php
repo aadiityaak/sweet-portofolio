@@ -38,6 +38,23 @@ $data_title = $data['title'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
     <style>
+        :root {
+            --sp-primary: #cc785c;
+            --sp-primary-active: #a9583e;
+            --sp-ink: #141413;
+            --sp-body: #3d3d3a;
+            --sp-muted: #6c6a64;
+            --sp-hairline: #e6dfd8;
+            --sp-canvas: #faf9f5;
+            --sp-surface-soft: #f5f0e8;
+            --sp-surface-card: #efe9de;
+            --sp-surface-dark: #181715;
+            --sp-surface-dark-elevated: #252320;
+            --sp-on-primary: #ffffff;
+            --sp-on-dark: #faf9f5;
+            --sp-on-dark-soft: #a09d96;
+        }
+
         #wpadminbar {
             display: none !important;
         }
@@ -58,89 +75,138 @@ $data_title = $data['title'] ?? '';
             padding: 0;
             overflow-x: hidden;
             height: 100%;
+            background: var(--sp-canvas);
+            color: var(--sp-body);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         .site-main {
-            max-width: 100% !important;
+            max-width: 1200px !important;
+            width: 100%;
+            margin: 0 auto;
             flex: 1;
             overflow: hidden;
         }
 
         .content-area {
-            padding-top: 0;
-            margin-top: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding: 24px;
+            box-sizing: border-box;
         }
 
         /* Header Preview Styles */
         .header-preview {
-            position: sticky;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            z-index: 999;
-            height: 60px;
+            gap: 16px;
+            background: var(--sp-surface-soft);
+            border: 1px solid var(--sp-hairline);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
             flex-shrink: 0;
+            box-sizing: border-box;
         }
 
-        .btn-whatsapp-portfolio {
+        .preview-header-copy {
+            min-width: 0;
+            flex: 1;
+            text-align: center;
+        }
+
+        .preview-kicker {
+            display: inline-block;
+            margin-bottom: 6px;
+            color: var(--sp-muted);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .preview-title {
+            margin: 0;
+            color: var(--sp-ink);
+            font-family: "Cormorant Garamond", "Times New Roman", serif;
+            font-size: clamp(1.45rem, 3vw, 2.15rem);
+            font-weight: 500;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+        }
+
+        .preview-subtitle {
+            margin: 8px 0 0;
+            color: var(--sp-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .preview-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background-color: #6c757d;
-            color: #fff;
+            justify-content: center;
+            gap: 10px;
+            min-height: 44px;
+            padding: 12px 18px;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .btn-whatsapp-portfolio:hover {
-            background-color: #5a6268;
-            transform: translateY(-1px);
-        }
-
-        .text-judul {
-            font-size: 16px;
             font-weight: 600;
-            color: #212529;
-            text-align: center;
-            flex: 1;
-            margin: 0 15px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            border: 1px solid transparent;
+        }
+
+        .preview-btn-back {
+            background: var(--sp-canvas);
+            border-color: var(--sp-hairline);
+            color: var(--sp-ink);
+        }
+
+        .preview-btn-back:hover {
+            background: var(--sp-surface-card);
+            color: var(--sp-ink);
+        }
+
+        .preview-btn-primary {
+            background: var(--sp-primary);
+            color: var(--sp-on-primary);
+        }
+
+        .preview-btn-primary:hover {
+            background: var(--sp-primary-active);
+            color: var(--sp-on-primary);
         }
 
         @media screen and (max-width: 767px) {
+            .content-area {
+                padding: 16px;
+            }
+
             .header-preview {
-                padding: 8px 15px;
-                height: 50px;
+                flex-direction: column;
+                align-items: stretch;
+                padding: 18px 16px;
             }
 
-            .text-judul {
-                font-size: 14px;
-                margin: 0 10px;
+            .preview-header-copy {
+                text-align: left;
             }
 
-            .btn-whatsapp-portfolio {
-                padding: 6px 12px;
-                font-size: 12px;
+            .preview-btn {
+                width: 100%;
             }
 
-            .btn-whatsapp-portfolio svg {
-                width: 14px;
-                height: 14px;
+            .header-preview-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
             }
         }
 
@@ -149,22 +215,27 @@ $data_title = $data['title'] ?? '';
             width: 100%;
             height: 100%;
             position: relative;
-            margin-top: 0;
-            padding-top: 0;
             flex: 1;
+            padding: 20px;
+            background: var(--sp-surface-dark);
+            border-radius: 16px;
+            box-sizing: border-box;
+            border: 1px solid rgba(250, 249, 245, 0.08);
         }
 
         #iframe-container iframe {
             width: 100%;
             height: 100%;
-            border: none;
+            border: 0;
+            border-radius: 12px;
             display: block;
             vertical-align: top;
+            background: #fff;
         }
 
         @media screen and (max-width: 767px) {
             #iframe-container {
-                height: 100%;
+                padding: 12px;
             }
         }
 
@@ -175,29 +246,31 @@ $data_title = $data['title'] ?? '';
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 4rem 2rem;
-            height: 100%;
-            margin-top: 0;
-            padding-top: 4rem;
+            padding: 56px 32px;
             flex: 1;
+            border-radius: 16px;
+            background: var(--sp-surface-soft);
+            border: 1px solid var(--sp-hairline);
         }
 
         .demo-icon {
-            color: #6c757d;
+            color: var(--sp-muted);
             margin-bottom: 1.5rem;
             opacity: 0.7;
         }
 
         .demo-not-available h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-family: "Cormorant Garamond", "Times New Roman", serif;
+            font-size: clamp(1.55rem, 3.4vw, 2.2rem);
+            font-weight: 500;
+            letter-spacing: -0.03em;
             margin-bottom: 1rem;
-            color: #212529;
+            color: var(--sp-ink);
         }
 
         .demo-not-available p {
             font-size: 1rem;
-            color: #6c757d;
+            color: var(--sp-muted);
             max-width: 500px;
             margin-bottom: 2rem;
             line-height: 1.6;
@@ -214,39 +287,42 @@ $data_title = $data['title'] ?? '';
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
+            justify-content: center;
+            min-height: 44px;
+            padding: 12px 18px;
             border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
             white-space: nowrap;
+            border: 1px solid transparent;
         }
 
         .btn-whatsapp-demo {
-            background-color: #25d366;
-            color: #fff;
+            background: var(--sp-primary);
+            color: var(--sp-on-primary);
         }
 
         .btn-whatsapp-demo:hover {
-            background-color: #128c7e;
-            transform: translateY(-2px);
+            background: var(--sp-primary-active);
+            color: var(--sp-on-primary);
         }
 
         .btn-back-demo {
-            background-color: #6c757d;
-            color: #fff;
+            background: var(--sp-canvas);
+            border-color: var(--sp-hairline);
+            color: var(--sp-ink);
         }
 
         .btn-back-demo:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
+            background: var(--sp-surface-card);
+            color: var(--sp-ink);
         }
 
         @media (max-width: 767px) {
             .demo-not-available {
-                padding: 2rem 1rem;
-                height: 100%;
+                padding: 40px 20px;
             }
 
             .demo-actions {
@@ -266,31 +342,36 @@ $data_title = $data['title'] ?? '';
 <body <?php body_class('wss-preview-page'); ?>>
     <div id="primary" class="content-area">
         <header class="header-preview">
-            <!-- Back to Home Button -->
-            <a class="btn-whatsapp-portfolio" href="<?php echo get_the_permalink($portofolio_page); ?>">
+            <a class="preview-btn preview-btn-back" href="<?php echo get_the_permalink($portofolio_page); ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
                 </svg>
                 Kembali
             </a>
-            <span class="text-judul"><b><?php echo get_bloginfo('name'); ?> - <?php echo $data_title; ?></b></span>
-            <?php
-            $whatsapp_option = get_option('portofolio_whatsapp_number'); // Prefix added to option name
-            // Mengganti "08" dengan "628" dan menghapus karakter selain angka
-            $whatsapp_number = preg_replace('/[^0-9]/', '', $whatsapp_option);
-            $whatsapp_number = preg_replace('/^0/', '62', $whatsapp_number);
+            <div class="preview-header-copy">
+                <span class="preview-kicker">Live Preview</span>
+                <h1 class="preview-title"><?php echo esc_html($data_title); ?></h1>
+                <p class="preview-subtitle"><?php echo esc_html(get_bloginfo('name')); ?> menampilkan preview portfolio dalam tampilan editorial yang lebih tenang dan fokus.</p>
+            </div>
+            <div class="header-preview-actions">
+                <?php
+                $whatsapp_option = get_option('portofolio_whatsapp_number'); // Prefix added to option name
+                // Mengganti "08" dengan "628" dan menghapus karakter selain angka
+                $whatsapp_number = preg_replace('/[^0-9]/', '', $whatsapp_option);
+                $whatsapp_number = preg_replace('/^0/', '62', $whatsapp_number);
 
-            if (!empty($whatsapp_number)) {
-                $whatsapp_message = "Saya tertarik dengan " . urlencode($data_title);
-                $whatsapp_url = "https://wa.me/$whatsapp_number?text=" . urlencode($whatsapp_message);
-            ?>
-                <a target="_blank" href="<?php echo esc_url($whatsapp_url); ?>" class="btn-whatsapp-portfolio">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
-                        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
-                    </svg>
-                    Order Langsung
-                </a>
-            <?php } ?>
+                if (!empty($whatsapp_number)) {
+                    $whatsapp_message = "Saya tertarik dengan " . urlencode($data_title);
+                    $whatsapp_url = "https://wa.me/$whatsapp_number?text=" . urlencode($whatsapp_message);
+                ?>
+                    <a target="_blank" href="<?php echo esc_url($whatsapp_url); ?>" class="preview-btn preview-btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
+                        </svg>
+                        Order Langsung
+                    </a>
+                <?php } ?>
+            </div>
         </header>
         <main id="main" class="site-main" role="main">
             <!-- Your iframe code here -->
