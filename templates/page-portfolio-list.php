@@ -170,42 +170,6 @@ if (!$categories_data) {
                 echo '[' . implode(',', array_map('intval', $shortcode_ids)) . ']';
                 ?>
                 )">
-                <section class="portfolio-hero">
-                    <div class="portfolio-hero-grid">
-                        <div class="portfolio-hero-copy">
-                            <span class="portfolio-badge">Pilihan Desain</span>
-                            <h1 class="portfolio-hero-title">Temukan pilihan desain website yang siap jadi inspirasi tampilan brand Anda.</h1>
-                            <p class="portfolio-hero-lead">
-                                Jelajahi berbagai konsep layout, gaya visual, dan arah desain website yang sudah kami kurasi
-                                untuk membantu Anda memilih tampilan yang paling sesuai dengan kebutuhan bisnis.
-                            </p>
-                            <div class="portfolio-hero-actions">
-                                <a href="#portfolio-grid" class="portfolio-btn portfolio-btn-primary">Lihat Pilihan Desain</a>
-                                <?php if (!empty($whatsapp_number)) : ?>
-                                    <a href="<?php echo esc_url('https://wa.me/' . $whatsapp_number); ?>" target="_blank" class="portfolio-btn portfolio-btn-secondary">Hubungi Kami</a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <div class="portfolio-hero-panel">
-                            <div class="portfolio-hero-panel-inner">
-                                <span class="portfolio-panel-kicker">Design Overview</span>
-                                <h2 class="portfolio-panel-title">Kumpulan desain yang memudahkan Anda membandingkan gaya sebelum memutuskan.</h2>
-                                <div class="portfolio-stat-list">
-                                    <div class="portfolio-stat-item">
-                                        <span class="portfolio-stat-label">Jumlah desain</span>
-                                        <strong class="portfolio-stat-value" x-text="filteredPortfolios.length"></strong>
-                                    </div>
-                                    <div class="portfolio-stat-item">
-                                        <span class="portfolio-stat-label">Kategori aktif</span>
-                                        <strong class="portfolio-stat-value" x-text="selectedCategory || 'Semua kategori'"></strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 <!-- Filter Form with Alpine.js -->
                 <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes';
                 if ($filter_attr !== 'no') : ?>

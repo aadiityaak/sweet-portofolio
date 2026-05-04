@@ -4,10 +4,85 @@ namespace SweetPortofolio\Admin;
 
 class Settings
 {
+    private const SETTINGS_GROUP = 'portofolio-whatsapp-settings-group';
+
     public function register()
     {
         add_action('admin_menu', [$this, 'add_menu_page']);
+        add_action('admin_init', [$this, 'register_settings']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
+    }
+
+    public function register_settings()
+    {
+        register_setting(self::SETTINGS_GROUP, 'portofolio_whatsapp_number', [
+            'type' => 'string',
+            'sanitize_callback' => [$this, 'sanitize_text'],
+            'default' => '',
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_access_key', [
+            'type' => 'string',
+            'sanitize_callback' => [$this, 'sanitize_text'],
+            'default' => '',
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_credit', [
+            'type' => 'string',
+            'sanitize_callback' => [$this, 'sanitize_text'],
+            'default' => '',
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_image_size', [
+            'type' => 'string',
+            'sanitize_callback' => [$this, 'sanitize_text'],
+            'default' => 'thumbnail',
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_style_thumbnail', [
+            'type' => 'string',
+            'sanitize_callback' => [$this, 'sanitize_text'],
+            'default' => 'thumbnail',
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_page', [
+            'type' => 'integer',
+            'sanitize_callback' => [$this, 'sanitize_page_id'],
+            'default' => -1,
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_preview_page', [
+            'type' => 'integer',
+            'sanitize_callback' => [$this, 'sanitize_page_id'],
+            'default' => -1,
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_selection', [
+            'type' => 'array',
+            'sanitize_callback' => [$this, 'sanitize_selection'],
+            'default' => [],
+        ]);
+    }
+
+    public function sanitize_text($value)
+    {
+        return sanitize_text_field((string) $value);
+    }
+
+    public function sanitize_page_id($value)
+    {
+        $page_id = absint($value);
+
+        return $page_id > 0 ? $page_id : -1;
+    }
+
+    public function sanitize_selection($value)
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('sanitize_text_field', $value)));
     }
 
     public function enqueue_admin_assets($hook)
@@ -164,8 +239,8 @@ class Settings
             </div>
 
             <form method="post" action="options.php">
-                <?php settings_fields('portofolio-whatsapp-settings-group'); ?>
-                <?php do_settings_sections('portofolio-whatsapp-settings-group'); ?>
+                <?php settings_fields(self::SETTINGS_GROUP); ?>
+                <?php do_settings_sections(self::SETTINGS_GROUP); ?>
 
                 <div class="sweet-portofolio-card">
                     <h2 class="sweet-portofolio-card-title">Basic Settings</h2>
