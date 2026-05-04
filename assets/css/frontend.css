@@ -542,13 +542,21 @@
 .btn-preview {
   background-color: rgba(250, 249, 245, 0.95);
   color: var(--sp-ink);
+  border: 1px solid rgba(20, 20, 19, 0.08);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .btn-preview:hover {
   background-color: var(--sp-canvas);
   color: var(--sp-ink);
-  box-shadow: none;
-  transform: none;
+  border-color: rgba(20, 20, 19, 0.16);
+  box-shadow: 0 10px 24px rgba(20, 20, 19, 0.14);
+  transform: translateY(-2px);
 }
 
 .btn-whatsapp {
