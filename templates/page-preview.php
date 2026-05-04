@@ -111,7 +111,6 @@ $data_title = $data['title'] ?? '';
             padding: 16px 20px;
             flex-shrink: 0;
             box-sizing: border-box;
-            transition: padding 0.25s ease, gap 0.25s ease, min-height 0.25s ease;
         }
 
         .header-preview-actions {
@@ -120,19 +119,6 @@ $data_title = $data['title'] ?? '';
             justify-content: flex-end;
             gap: 12px;
             flex-shrink: 0;
-        }
-
-        body.preview-header-hidden .header-preview {
-            justify-content: flex-end;
-            gap: 0;
-            min-height: 64px;
-            padding: 10px 16px;
-        }
-
-        body.preview-header-hidden .preview-btn-back,
-        body.preview-header-hidden .preview-header-copy,
-        body.preview-header-hidden .header-preview-actions>a.preview-btn-primary {
-            display: none;
         }
 
         .preview-header-copy {
@@ -184,32 +170,6 @@ $data_title = $data['title'] ?? '';
             border: 1px solid transparent;
         }
 
-        .preview-toggle-btn {
-            width: 42px;
-            min-width: 42px;
-            height: 42px;
-            min-height: 42px;
-            padding: 0;
-            cursor: pointer;
-            background: rgba(24, 23, 21, 0.82);
-            color: var(--sp-on-dark);
-            border-color: rgba(250, 249, 245, 0.12);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 12px 28px rgba(20, 20, 19, 0.18);
-            border-radius: 9999px;
-            flex: 0 0 42px;
-        }
-
-        .preview-toggle-btn:hover {
-            background: rgba(24, 23, 21, 0.92);
-            color: var(--sp-on-dark);
-        }
-
-        .preview-toggle-btn svg {
-            width: 18px;
-            height: 18px;
-        }
-
         .preview-btn-back {
             background: var(--sp-canvas);
             border-color: var(--sp-hairline);
@@ -251,14 +211,6 @@ $data_title = $data['title'] ?? '';
                 flex-direction: column;
                 gap: 12px;
                 width: 100%;
-            }
-
-            body.preview-header-hidden .header-preview {
-                padding: 10px 12px;
-            }
-
-            body.preview-header-hidden .header-preview-actions {
-                width: auto;
             }
         }
 
@@ -413,11 +365,6 @@ $data_title = $data['title'] ?? '';
                         Order Langsung
                     </a>
                 <?php } ?>
-                <button type="button" class="preview-btn preview-toggle-btn" id="preview-header-toggle" aria-controls="preview-header" aria-expanded="true" aria-label="Sembunyikan header" title="Sembunyikan header">
-                    <svg id="preview-header-toggle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M1.646 10.854a.5.5 0 0 1 .708 0L8 16.5l5.646-5.646a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" transform="scale(1 .7) translate(0 -4)" />
-                    </svg>
-                </button>
             </div>
         </header>
         <main id="main" class="site-main" role="main">
@@ -459,36 +406,6 @@ $data_title = $data['title'] ?? '';
             <?php endif; ?>
         </main><!-- #main -->
     </div><!-- #primary -->
-
-    <script>
-        (function() {
-            const body = document.body;
-            const toggleButton = document.getElementById('preview-header-toggle');
-            const toggleIcon = document.getElementById('preview-header-toggle-icon');
-            const hiddenClass = 'preview-header-hidden';
-
-            if (!toggleButton || !toggleIcon) {
-                return;
-            }
-
-            const updateToggleState = () => {
-                const isHidden = body.classList.contains(hiddenClass);
-                toggleButton.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
-                toggleButton.setAttribute('aria-label', isHidden ? 'Tampilkan header' : 'Sembunyikan header');
-                toggleButton.setAttribute('title', isHidden ? 'Tampilkan header' : 'Sembunyikan header');
-                toggleIcon.innerHTML = isHidden ?
-                    '<path fill-rule="evenodd" d="M1.646 5.146a.5.5 0 0 1 .708 0L8 10.793l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" transform="scale(1 .7) translate(0 3)" />' :
-                    '<path fill-rule="evenodd" d="M1.646 10.854a.5.5 0 0 1 .708 0L8 16.5l5.646-5.646a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" transform="scale(1 .7) translate(0 -4)" />';
-            };
-
-            toggleButton.addEventListener('click', () => {
-                body.classList.toggle(hiddenClass);
-                updateToggleState();
-            });
-
-            updateToggleState();
-        })();
-    </script>
 
     <?php wp_footer(); ?>
 </body>
