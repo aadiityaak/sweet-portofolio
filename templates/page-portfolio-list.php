@@ -259,7 +259,24 @@ if (!$categories_data) {
                         <span aria-hidden="true">&laquo;</span>
                     </span>
 
-                    <div class="pagination-pages" @click="handlePaginationClick($event)" @keydown="handlePaginationKeydown($event)" x-html="renderPaginationButtons()"></div>
+                    <div class="pagination-pages">
+                        <template x-for="page in visiblePages" :key="'page-' + page">
+                            <template x-if="isEllipsis(page)">
+                                <span class="pagination-btn disabled" aria-disabled="true" x-text="page"></span>
+                            </template>
+                            <template x-if="!isEllipsis(page)">
+                                <span
+                                    class="pagination-btn"
+                                    :class="{'active': page === currentPage}"
+                                    role="button"
+                                    tabindex="0"
+                                    @click="goToPage(page)"
+                                    @keydown.enter.prevent="goToPage(page)"
+                                    @keydown.space.prevent="goToPage(page)"
+                                    x-text="page"></span>
+                            </template>
+                        </template>
+                    </div>
 
                     <span
                         @click="if (currentPage < totalPages) goToPage(currentPage + 1)"

@@ -8,8 +8,17 @@
 })(function () {
   "use strict";
 
-  // Alpine.js initialization
-  document.addEventListener("alpine:init", () => {
+  const registerAlpineComponents = () => {
+    if (typeof window.Alpine === "undefined") {
+      return;
+    }
+
+    if (window.__sweetPortofolioAlpineRegistered) {
+      return;
+    }
+
+    window.__sweetPortofolioAlpineRegistered = true;
+
     // Modal component for category selection
     Alpine.data("categoryModal", () => ({
       modalOpen: false,
@@ -268,6 +277,10 @@
           return Math.ceil(this.filteredPortfolios.length / this.itemsPerPage);
         },
 
+        get visiblePages() {
+          return this.getVisiblePages();
+        },
+
         getWhatsAppUrl(portfolio) {
           if (!this.whatsappNumber || !portfolio || !portfolio.title)
             return "#";
@@ -401,65 +414,18 @@
           return rangeWithDots;
         },
 
-        renderPaginationButtons() {
-          return this.getVisiblePages()
-            .map((page) => {
-              const isEllipsis = page === "...";
-              const isActive = page === this.currentPage;
-              const classes = ["pagination-btn"];
-
-              if (isActive) {
-                classes.push("active");
-              }
-
-              if (isEllipsis) {
-                classes.push("disabled");
-              }
-
-              return `<span class="${classes.join(" ")}"${
-                isEllipsis
-                  ? ' aria-disabled="true"'
-                  : ` data-page="${page}" role="button" tabindex="0"`
-              }>${page}</span>`;
-            })
-            .join("");
-        },
-
-        handlePaginationClick(event) {
-          const button = event.target.closest("[data-page]");
-
-          if (!button) {
-            return;
-          }
-
-          const page = parseInt(button.getAttribute("data-page"), 10);
-
-          if (!Number.isNaN(page)) {
-            this.goToPage(page);
-          }
-        },
-
-        handlePaginationKeydown(event) {
-          if (event.key !== "Enter" && event.key !== " ") {
-            return;
-          }
-
-          const button = event.target.closest("[data-page]");
-
-          if (!button) {
-            return;
-          }
-
-          event.preventDefault();
-          const page = parseInt(button.getAttribute("data-page"), 10);
-
-          if (!Number.isNaN(page)) {
-            this.goToPage(page);
-          }
+        isEllipsis(page) {
+          return page === "...";
         },
       }),
     );
-  });
+  };
+
+  if (window.Alpine) {
+    registerAlpineComponents();
+  }
+
+  document.addEventListener("alpine:init", registerAlpineComponents);
 
   // Fallback for browsers without Alpine.js and to handle double-click issue
   document.addEventListener("DOMContentLoaded", function () {

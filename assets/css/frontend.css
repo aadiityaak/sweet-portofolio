@@ -358,6 +358,11 @@
   background: var(--sp-surface-card);
 }
 
+.card-meta-pill {
+  background: var(--sp-surface-soft);
+  border: 1px solid var(--sp-hairline);
+}
+
 .portfolio-results-title,
 .portfolio-empty-title {
   font-family: "Cormorant Garamond", "Times New Roman", serif;
@@ -547,13 +552,13 @@
 }
 
 .btn-whatsapp {
-  background-color: var(--sp-primary);
-  color: var(--sp-on-primary);
+  background-color: #25d366;
+  color: #ffffff;
 }
 
 .btn-whatsapp:hover {
-  background-color: var(--sp-primary-active);
-  color: var(--sp-on-primary);
+  background-color: #128c7e;
+  color: #ffffff;
   box-shadow: none;
   transform: none;
 }
@@ -582,15 +587,16 @@
 
 .card-title {
   margin: 0;
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  font-family: "Space Grotesk", Arial, sans-serif;
   font-size: 28px;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.08;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .card-title-link {
   color: var(--sp-ink);
+  font-family: inherit;
 }
 
 .card-title-link:hover {

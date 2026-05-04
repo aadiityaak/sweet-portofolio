@@ -50,20 +50,14 @@ class Enqueue
      */
     public function enqueue_styles()
     {
+        wp_enqueue_style('sweet-portofolio-fonts', 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap', array(), null);
         wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/frontend.css', array(), SWEETPORTOFOLIO_VERSION);
         wp_enqueue_script('jquery');
+        $script_path = SWEETPORTOFOLIO_PATH . 'assets/js/script.js';
+        $script_version = file_exists($script_path) ? (string) filemtime($script_path) : SWEETPORTOFOLIO_VERSION;
 
-        // Use minified script if not in debug mode
-        $js_ext = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '.js' : '.min.js';
-        $js_path = 'assets/js/script' . $js_ext;
-
-        // Fallback to non-minified if minified doesn't exist
-        if (!file_exists(SWEETPORTOFOLIO_PATH . $js_path)) {
-            $js_path = 'assets/js/script.js';
-        }
-
-        // Load portfolio script normally for all pages
-        wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . $js_path, array('jquery'), SWEETPORTOFOLIO_VERSION, true);
+        // Load the readable source file directly so frontend behavior always matches current code changes.
+        wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), $script_version, true);
 
         // Define filters GLOBALLY to ensure they apply when script is loaded via Shortcode or Template
         // Defer script loading and add cache optimizer exclusions
@@ -108,37 +102,5 @@ class Enqueue
     /**
      * Add inline scripts
      */
-    public function inline_scripts()
-    {
-        // Only add on portfolio list page
-        if (is_page_template('page-portfolio-list.php') || get_query_var('pagename') === 'portfolio') {
-?>
-            <script>
-                // Ensure Alpine.js is properly loaded
-                window.addEventListener('load', function() {
-
-                    // Skip fallback when Alpine is already available or another Alpine script tag exists.
-                    if (
-                        typeof window.Alpine !== 'undefined' ||
-                        document.querySelector('script[src*="alpinejs"]')
-                    ) {
-                        return;
-                    }
-
-                    console.warn('Alpine.js not yet loaded, loading it manually...');
-
-                    // Load Alpine.js manually
-                    var script = document.createElement('script');
-                    script.src = 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js';
-                    script.defer = true;
-                    script.setAttribute('data-no-optimize', '1');
-                    script.onerror = function() {
-                        console.error('Failed to load Alpine.js via fallback');
-                    };
-                    document.head.appendChild(script);
-                });
-            </script>
-<?php
-        }
-    }
+    public function inline_scripts() {}
 }

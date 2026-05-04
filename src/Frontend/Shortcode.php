@@ -122,16 +122,10 @@ class Shortcode
         wp_enqueue_style('sweet-portofolio-style', SWEETPORTOFOLIO_URL . 'assets/css/frontend.css', array(), SWEETPORTOFOLIO_VERSION);
         wp_enqueue_script('jquery');
 
-        // Use minified script if not in debug mode
-        $js_ext = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '.js' : '.min.js';
-        $js_path = 'assets/js/script' . $js_ext;
+        $script_path = SWEETPORTOFOLIO_PATH . 'assets/js/script.js';
+        $script_version = file_exists($script_path) ? (string) filemtime($script_path) : SWEETPORTOFOLIO_VERSION;
 
-        // Fallback to non-minified if minified doesn't exist
-        if (!file_exists(SWEETPORTOFOLIO_PATH . $js_path)) {
-            $js_path = 'assets/js/script.js';
-        }
-
-        wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . $js_path, array('jquery'), SWEETPORTOFOLIO_VERSION, true);
+        wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), $script_version, true);
         // Load Alpine.js only when it has not already been loaded by the theme or another plugin.
         if (!$this->has_alpine_script()) {
             wp_enqueue_script('sweet-alpine-js-frontend', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
