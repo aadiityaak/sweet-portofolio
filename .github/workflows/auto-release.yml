@@ -16,12 +16,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -69,7 +69,30 @@ jobs:
 
       - name: Build + Zip
         if: steps.cmp.outputs.should_release == 'true'
-        run: npm run zip
+        run: |
+          set -e
+          PKG="dist/sweet-portofolio"
+
+          # clean + create dirs
+          rm -rf dist
+          mkdir -p "$PKG/assets/css" "$PKG/assets/js" "$PKG/src" "$PKG/templates"
+
+          # minify CSS
+          npx cleancss -o "$PKG/assets/css/admin.min.css" assets/css/admin.css
+          npx cleancss -o "$PKG/assets/css/frontend.min.css" assets/css/frontend.css
+
+          # minify JS
+          npx terser assets/js/script.js -o "$PKG/assets/js/script.min.js" --compress --mangle
+
+          # copy sources
+          cp -r assets/* "$PKG/assets/"
+          cp -r src/* "$PKG/src/"
+          cp -r templates/* "$PKG/templates/"
+          cp sweet-portofolio.php "$PKG/"
+          cp README.md "$PKG/"
+
+          # zip
+          npx bestzip dist/sweet-portofolio.zip "$PKG"
 
       - name: Create GitHub Release
         if: steps.cmp.outputs.should_release == 'true'
