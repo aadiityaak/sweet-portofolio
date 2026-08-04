@@ -62,6 +62,19 @@ class Settings
             'sanitize_callback' => [$this, 'sanitize_selection'],
             'default' => [],
         ]);
+
+        // WSCRM API settings
+        register_setting(self::SETTINGS_GROUP, 'portofolio_api_source', [
+            'type' => 'string',
+            'sanitize_callback' => [$this, 'sanitize_text'],
+            'default' => 'wscrm',
+        ]);
+
+        register_setting(self::SETTINGS_GROUP, 'portofolio_wscrm_api_url', [
+            'type' => 'string',
+            'sanitize_callback' => [$this, 'sanitize_url'],
+            'default' => 'https://app.websweetstudio.com',
+        ]);
     }
 
     public function sanitize_text($value)
@@ -83,6 +96,16 @@ class Settings
         }
 
         return array_values(array_filter(array_map('sanitize_text_field', $value)));
+    }
+
+    public function sanitize_url($value)
+    {
+        $value = rtrim(esc_url_raw($value), '/');
+        // Flush wscrm cache on URL change
+        if (class_exists('\SweetPortofolio\Api\WscrmClient')) {
+            (new \SweetPortofolio\Api\WscrmClient())->flushCache();
+        }
+        return $value;
     }
 
     public function enqueue_admin_assets($hook)
@@ -202,12 +225,18 @@ class Settings
                 if (isset($_GET['cache-cleared']) && $_GET['cache-cleared'] == 'true') {
                     delete_transient('web_data_transient');
                     delete_transient('jenis_web_data');
+                    if (class_exists('\SweetPortofolio\Api\WscrmClient')) {
+                        (new \SweetPortofolio\Api\WscrmClient())->flushCache();
+                    }
                     echo '<script>window.location.href = "' . admin_url('admin.php?page=portofolio-settings&cache-cleared-redirect=true') . '";</script>';
                 }
 
                 if (isset($_GET['refresh-data']) && $_GET['refresh-data'] == 'true') {
                     delete_transient('web_data_transient');
                     delete_transient('jenis_web_data');
+                    if (class_exists('\SweetPortofolio\Api\WscrmClient')) {
+                        (new \SweetPortofolio\Api\WscrmClient())->flushCache();
+                    }
                     echo '<script>window.location.href = "' . admin_url('admin.php?page=portofolio-settings&data-refreshed=true') . '";</script>';
                 }
 
@@ -423,8 +452,54 @@ class Settings
                     </div>
                 </div>
 
-                <div class="sweet-portofolio-form-actions">
-                    <input type="submit" name="submit" id="submit" class="sweet-portofolio-submit" value="Save Changes">
+                <div class="sweet-portofolio-form-actions"></div>
+
+                <div class="sweet-portofolio-card">
+                    <h2 class="sweet-portofolio-card-title">API Source</h2>
+                    <p class="sweet-portofolio-help-text" style="margin-bottom: 16px">
+                        Pilih sumber data portfolio. <strong>WSCRM API</strong> menggunakan REST API dari <code>app.websweetstudio.com</code> (public, no auth).
+                        <strong>Legacy API</strong> menggunakan API lama dengan access key.
+                    </p>
+                    <div class="sweet-portofolio-form-row">
+                        <div class="sweet-portofolio-form-col">
+                            <label for="portofolio_api_source" class="sweet-portofolio-label">Sumber API</label>
+                            <select name="portofolio_api_source" id="portofolio_api_source" class="sweet-portofolio-input">
+                                <option value="wscrm" <?php selected(get_option('portofolio_api_source', 'wscrm'), 'wscrm'); ?>>WSCRM API (app.websweetstudio.com)</option>
+                                <option value="legacy" <?php selected(get_option('portofolio_api_source', 'wscrm'), 'legacy'); ?>>Legacy API (my.websweetstudio.com)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="sweet-portofolio-form-row" id="wscrm-api-url-row" style="<?php echo get_option('portofolio_api_source', 'wscrm') === 'legacy' ? 'display:none' : ''; ?>">
+                        <div class="sweet-portofolio-form-col">
+                            <label for="portofolio_wscrm_api_url" class="sweet-portofolio-label">WSCRM API URL</label>
+                            <input type="url" name="portofolio_wscrm_api_url" id="portofolio_wscrm_api_url"
+                                   value="<?php echo esc_attr(get_option('portofolio_wscrm_api_url', 'https://app.websweetstudio.com')); ?>"
+                                   class="sweet-portofolio-input" style="max-width: 500px" />
+                            <p class="sweet-portofolio-help-text">Default: <code>https://app.websweetstudio.com</code>. Ubah jika self-hosted.</p>
+                        </div>
+                    </div>
+                    <?php
+                    // Show connection status for wscrm
+                    if (get_option('portofolio_api_source', 'wscrm') === 'wscrm' && class_exists('\SweetPortofolio\Api\WscrmClient')) {
+                        $wscrm = new \SweetPortofolio\Api\WscrmClient();
+                        $wscrmData = $wscrm->fetchDemos();
+                        if (isset($wscrmData['error'])) {
+                            echo '<div class="sweet-portofolio-notice sweet-portofolio-notice-error" style="margin-top:12px"><p>WSCRM API Error: ' . esc_html($wscrmData['error']) . '</p></div>';
+                        } else {
+                            $demoCount = count($wscrmData['demos'] ?? []);
+                            $catCount = count($wscrmData['categories'] ?? []);
+                            echo '<div class="sweet-portofolio-notice sweet-portofolio-notice-success" style="margin-top:12px"><p>Connected! ' . $demoCount . ' demo, ' . $catCount . ' kategori tersedia.</p></div>';
+                        }
+                    }
+                    ?>
+                    <script>
+                    document.getElementById('portofolio_api_source').addEventListener('change', function() {
+                        document.getElementById('wscrm-api-url-row').style.display = this.value === 'legacy' ? 'none' : '';
+                    });
+                    </script>
+                </div>
+
+                <input type="submit" name="submit" id="submit" class="sweet-portofolio-submit" value="Save Changes">
                 </div>
             </form>
         </div>

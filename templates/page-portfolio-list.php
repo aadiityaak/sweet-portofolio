@@ -35,63 +35,94 @@ $whatsapp_number = preg_replace('/[^0-9]/', '', $whatsapp_number);
 $whatsapp_number = preg_replace('/^0/', '62', $whatsapp_number);
 
 // Get portfolio data
+$api_source = get_option('portofolio_api_source', 'wscrm');
 $transient_key = 'web_data_transient';
-$data = get_transient($transient_key);
 
-// Check if access_key is set
-if (empty($access_key)) {
-    $error_message = 'Access Key is not set. Please configure the access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
-}
+if ($api_source === 'wscrm' && class_exists('\SweetPortofolio\Api\WscrmClient')) {
+    // Fetch from wscrm API
+    $wscrm = new \SweetPortofolio\Api\WscrmClient();
+    $data = $wscrm->fetchDemos();
 
-// Check if transient contains error data
-if ($data !== false && isset($data['code']) && $data['code'] === 'rest_forbidden') {
-    // Clear the transient with error data
-    delete_transient($transient_key);
-    $data = false;
-}
-
-if (false === $data) {
-    $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/portofolio?access_key=' . $access_key;
-
-    if (!empty($image_size)) {
-        $api_url .= '&image_size=' . $image_size;
-    }
-
-    $response = wp_remote_get($api_url);
-
-    if (is_wp_error($response)) {
-        $error_message = 'Error fetching data from API: ' . esc_html($response->get_error_message());
+    if (isset($data['error'])) {
+        $error_message = 'WSCRM API Error: ' . esc_html($data['error']);
+        $data = [];
     } else {
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
+        // Data is already transformed to legacy format
+        $categories_data = isset($data['categories']) ? $data['categories'] : [];
+        $data = isset($data['demos']) ? $data['demos'] : [];
+    }
+} else {
+    // Legacy API flow
+    $data = get_transient($transient_key);
 
-        // Debug: Log API response
-        error_log('API Response: ' . $body);
+    if (empty($access_key)) {
+        $error_message = 'Access Key is not set. Please configure the access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
+    }
 
-        // Check if response contains an error
-        if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
-            error_log('API Error: Access forbidden - ' . ($data['message'] ?? 'Unknown error'));
-            $error_message = 'API Access Forbidden: Invalid access key. Please check your access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
-            // Don't save error data to transient
-            $data = [];
-        } elseif (isset($data['code'])) {
-            error_log('API Error: ' . $data['code'] . ' - ' . ($data['message'] ?? 'Unknown error'));
-            $error_message = 'API Error: ' . esc_html($data['message'] ?? 'Unknown error');
-            $data = [];
+    if ($data !== false && isset($data['code']) && $data['code'] === 'rest_forbidden') {
+        delete_transient($transient_key);
+        $data = false;
+    }
+
+    if (false === $data) {
+        $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/portofolio?access_key=' . $access_key;
+
+        if (!empty($image_size)) {
+            $api_url .= '&image_size=' . $image_size;
         }
 
-        // Only save valid data to transient
-        if (!isset($data['code'])) {
-            set_transient($transient_key, $data, 12 * 3600);
+        $response = wp_remote_get($api_url);
+
+        if (is_wp_error($response)) {
+            $error_message = 'Error fetching data from API: ' . esc_html($response->get_error_message());
+        } else {
+            $body = wp_remote_retrieve_body($response);
+            $data = json_decode($body, true);
+
+            error_log('API Response: ' . $body);
+
+            if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
+                error_log('API Error: Access forbidden - ' . ($data['message'] ?? 'Unknown error'));
+                $error_message = 'API Access Forbidden: Invalid access key. Please check your access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
+                $data = [];
+            } elseif (isset($data['code'])) {
+                error_log('API Error: ' . $data['code'] . ' - ' . ($data['message'] ?? 'Unknown error'));
+                $error_message = 'API Error: ' . esc_html($data['message'] ?? 'Unknown error');
+                $data = [];
+            }
+
+            if (!isset($data['code'])) {
+                set_transient($transient_key, $data, 12 * 3600);
+            }
         }
     }
-}
 
-// Check if data contains error before filtering
-if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
-    // Reset data to empty array if it contains an error
-    $error_message = 'API Access Forbidden: Invalid access key. Please check your access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
-    $data = [];
+    if (isset($data['code']) && $data['code'] === 'rest_forbidden') {
+        $error_message = 'API Access Forbidden: Invalid access key. Please check your access key in <a href="' . admin_url('admin.php?page=portofolio-settings') . '">Portofolio Settings</a>.</div>';
+        $data = [];
+    }
+
+    // Fetch categories for legacy
+    $categories_data = get_transient('jenis_web_data');
+    if (!$categories_data) {
+        if (!empty($access_key)) {
+            $categories_api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
+            $response = wp_remote_get($categories_api_url);
+
+            if (!is_wp_error($response)) {
+                $body = wp_remote_retrieve_body($response);
+                $categories_data = json_decode($body, true);
+
+                if (is_array($categories_data) && !isset($categories_data['code'])) {
+                    set_transient('jenis_web_data', $categories_data, 12 * 3600);
+                }
+            }
+        }
+
+        if (!is_array($categories_data)) {
+            $categories_data = array();
+        }
+    }
 }
 
 // Get current page from URL
@@ -99,32 +130,6 @@ $current_page = isset($_GET['halaman']) ? (int)$_GET['halaman'] : 1;
 $jenis_web = isset($_GET['jenis_web']) ? sanitize_text_field($_GET['jenis_web']) : '';
 if (isset($shortcode_category) && !empty($shortcode_category)) {
     $jenis_web = $shortcode_category;
-}
-
-// Get categories for filter dropdown
-$categories_data = get_transient('jenis_web_data');
-
-// If categories data is not available, fetch it
-if (!$categories_data) {
-    if (!empty($access_key)) {
-        $categories_api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/jenis-web?access_key=' . $access_key;
-        $response = wp_remote_get($categories_api_url);
-
-        if (!is_wp_error($response)) {
-            $body = wp_remote_retrieve_body($response);
-            $categories_data = json_decode($body, true);
-
-            // Save categories to transient for 12 hours
-            if (is_array($categories_data) && !isset($categories_data['code'])) {
-                set_transient('jenis_web_data', $categories_data, 12 * 3600);
-            }
-        }
-    }
-
-    // If still no data, set as empty array
-    if (!is_array($categories_data)) {
-        $categories_data = array();
-    }
 }
 ?>
 <?php if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {
