@@ -92,7 +92,7 @@ jobs:
           cp README.md "$PKG/"
 
           # zip
-          npx bestzip dist/sweet-portofolio.zip "$PKG"
+          cd dist && npx bestzip sweet-portofolio.zip sweet-portofolio
 
       - name: Create GitHub Release
         if: steps.cmp.outputs.should_release == 'true'
