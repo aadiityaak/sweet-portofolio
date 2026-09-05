@@ -17,11 +17,25 @@ class WscrmClient
     /**
      * Fetch demos from wscrm API. Returns data in format compatible
      * with the existing portfolio template (Alpine.js).
+     *
+     * Optional query params supported by the API:
+     * - category: filter by category slug
+     * - package:  filter by package slug
      */
-    public function fetchDemos(): array
+    public function fetchDemos(array $query = []): array
     {
+        $params = [];
+        foreach (['category', 'package'] as $key) {
+            if (!empty($query[$key])) {
+                $params[$key] = sanitize_title((string) $query[$key]);
+            }
+        }
+
         $url = $this->base_url . '/api/demos';
-        $cache_key = 'portofolio_wscrm_data';
+        if ($params) {
+            $url .= '?' . build_query($params);
+        }
+        $cache_key = 'portofolio_wscrm_data' . ($params ? '_' . md5(build_query($params)) : '');
 
         $cached = get_transient($cache_key);
         if ($cached !== false) {
@@ -102,6 +116,56 @@ class WscrmClient
             'demos' => $transformed,
             'categories' => $categories,
             'packages' => $raw['packages'] ?? [],
+        ];
+
+        set_transient($cache_key, $result, HOUR_IN_SECONDS);
+
+        return $result;
+    }
+
+    /**
+     * Fetch a single demo from wscrm API by ID (GET /api/demos/{id}).
+     */
+    public function fetchDemo(int $id): array
+    {
+        $url = $this->base_url . '/api/demos/' . $id;
+        $cache_key = 'portofolio_wscrm_demo_' . $id;
+
+        $cached = get_transient($cache_key);
+        if ($cached !== false) {
+            return $cached;
+        }
+
+        $response = wp_remote_get($url, [
+            'timeout' => 15,
+            'headers' => ['Referer' => home_url()],
+        ]);
+
+        if (is_wp_error($response)) {
+            return ['error' => $response->get_error_message()];
+        }
+
+        $code = wp_remote_retrieve_response_code($response);
+        if ($code !== 200) {
+            return ['error' => "HTTP $code"];
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $demo = json_decode($body, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return ['error' => 'Invalid JSON'];
+        }
+
+        $result = [
+            'id' => (int) ($demo['id'] ?? $id),
+            'title' => $demo['title'] ?? '',
+            'url' => $demo['url'] ?? '',
+            'category' => $demo['category'] ?? '',
+            'category_slug' => $demo['category_slug'] ?? '',
+            'packages' => $demo['packages'] ?? [],
+            'featured_image' => $demo['featured_image'] ?? '',
+            'description' => $demo['description'] ?? '',
         ];
 
         set_transient($cache_key, $result, HOUR_IN_SECONDS);

@@ -14,20 +14,35 @@ global $post;
 $access_key = get_option('portofolio_access_key'); // Ganti dengan kunci akses yang Anda gunakan
 $image_size = get_option('portofolio_image_size'); // Ganti dengan kunci akses yang Anda gunakan
 $portofolio_page = get_option('portofolio_page');
-$id = $_GET['id'] ?? '';
-$api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/id?id=' . $id . '&access_key=' . $access_key;
+$id = isset($_GET['id']) ? absint($_GET['id']) : 0;
 
-if (!empty($image_size)) {
-    $api_url .= '&image_size=' . $image_size;
+$api_source = get_option('portofolio_api_source', 'wscrm');
+
+if ($api_source === 'wscrm' && $id > 0 && class_exists('\SweetPortofolio\Api\WscrmClient')) {
+    // Fetch single demo from wscrm API (GET /api/demos/{id})
+    $wscrm = new \SweetPortofolio\Api\WscrmClient();
+    $data = $wscrm->fetchDemo($id);
+
+    if (isset($data['error'])) {
+        error_log('WSCRM API Error (preview): ' . $data['error']);
+        $data = [];
+    }
+} else {
+    $api_url = 'https://my.websweetstudio.com/wp-json/wp/v2/id?id=' . $id . '&access_key=' . $access_key;
+
+    if (!empty($image_size)) {
+        $api_url .= '&image_size=' . $image_size;
+    }
+    $response = wp_remote_get($api_url);
+
+    if (is_wp_error($response)) {
+        return 'Error fetching data from API.';
+    }
+
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
 }
-$response = wp_remote_get($api_url);
 
-if (is_wp_error($response)) {
-    return 'Error fetching data from API.';
-}
-
-$body = wp_remote_retrieve_body($response);
-$data = json_decode($body, true);
 $data_title = $data['title'] ?? '';
 ?>
 <!DOCTYPE html>
@@ -370,7 +385,8 @@ $data_title = $data['title'] ?? '';
         <main id="main" class="site-main" role="main">
             <!-- Your iframe code here -->
             <?php
-            $demo_url = $data['url_live_preview'] ?? '';
+            // Demo detail fetched via GET /api/demos/{id}; demo URL field is "url"
+            $demo_url = $data['url'] ?? '';
 
             if (!empty($demo_url)) :
             ?>
