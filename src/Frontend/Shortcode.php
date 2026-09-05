@@ -80,7 +80,8 @@ class Shortcode
             'default' => '',
             'include' => '',
             'title' => 'yes',
-            'filter' => 'yes'
+            'filter' => 'yes',
+            'description' => 'no'
         ), $atts, 'sweet-portofolio-list');
 
         $shortcode_ids = array();
@@ -94,9 +95,10 @@ class Shortcode
         }
 
         $shortcode_title = sanitize_text_field($atts['title']);
+        $shortcode_description = sanitize_text_field($atts['description']);
 
         // Pass to common render method
-        return $this->render_output($shortcode_ids, $shortcode_category, $shortcode_title, $atts['filter']);
+        return $this->render_output($shortcode_ids, $shortcode_category, $shortcode_title, $atts['filter'], $shortcode_description);
     }
 
     /**
@@ -106,12 +108,13 @@ class Shortcode
      * @param string $shortcode_category
      * @param string $shortcode_title
      * @param string $filter
+     * @param string $description
      * @return string
      */
-    private function render_output($shortcode_ids, $shortcode_category, $shortcode_title, $filter)
+    private function render_output($shortcode_ids, $shortcode_category, $shortcode_title, $filter, $description = 'yes')
     {
         // Setup variables expected by the template
-        $atts = array('filter' => $filter);
+        $atts = array('filter' => $filter, 'description' => $description);
 
         ob_start();
         if (!defined('SWEETPORTOFOLIO_SHORTCODE')) {

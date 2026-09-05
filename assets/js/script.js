@@ -92,6 +92,7 @@
         itemsPerPage: 12, // Fixed value
         selectedCategory: initialCategory,
         showTitle: showTitle,
+        showDescription: showDescription,
         styleThumbnail: styleThumbnail,
         previewPage: previewPage,
         whatsappNumber: whatsappNumber,

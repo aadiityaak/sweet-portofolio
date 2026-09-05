@@ -174,6 +174,12 @@ if (isset($shortcode_category) && !empty($shortcode_category)) {
                 <?php
                 echo '[' . implode(',', array_map('intval', $shortcode_ids)) . ']';
                 ?>
+                ,
+                <?php
+                // Show card description (excerpt) unless disabled via shortcode attribute
+                $description_attr = (isset($atts) && is_array($atts) && isset($atts['description'])) ? $atts['description'] : 'yes';
+                echo ($description_attr === 'no') ? 'false' : 'true';
+                ?>
                 )">
                 <!-- Filter Form with Alpine.js -->
                 <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes';
@@ -243,7 +249,7 @@ if (isset($shortcode_category) && !empty($shortcode_category)) {
                                     <h3 x-show="showTitle !== 'no'" class="card-title">
                                         <a :href="getPreviewUrl(item)" x-text="item.title" class="card-title-link"></a>
                                     </h3>
-                                    <p x-show="item.excerpt" class="card-excerpt" x-html="item.excerpt"></p>
+                                    <p x-show="item.excerpt && showDescription" class="card-excerpt" x-html="item.excerpt"></p>
                                 </div>
                             </div>
                         </div>
