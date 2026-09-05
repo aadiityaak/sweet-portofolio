@@ -428,6 +428,50 @@
 
   document.addEventListener("alpine:init", registerAlpineComponents);
 
+  // Recovery: if Alpine started before this script (e.g. theme/optimizer loaded
+  // Alpine in the head, shortcode markup appears before the footer script),
+  // Alpine already processed x-data="portfolioGrid(...)" as plain data and the
+  // page breaks with "showDescription is not defined" etc. Re-registering is
+  // not enough — the tree must be destroyed and re-initialized.
+  document.addEventListener("DOMContentLoaded", () => {
+    if (!window.Alpine) {
+      return;
+    }
+
+    registerAlpineComponents();
+
+    const shells = document.querySelectorAll(".portfolio-shell");
+    if (!shells.length) {
+      return;
+    }
+
+    // Only recover shells whose component is not actually registered.
+    const unregistered = [...shells].filter((shell) => {
+      const data = Alpine.$data(shell);
+      return !data || typeof data !== "object" || data.showDescription === undefined;
+    });
+    if (!unregistered.length) {
+      return;
+    }
+
+    // Defer to the next microtask so registerAlpineComponents() above
+    // definitely finished registering Alpine.data("portfolioGrid").
+    setTimeout(() => {
+      unregistered.forEach((shell) => {
+        try {
+          Alpine.destroyTree(shell);
+        } catch (e) {
+          // ignore
+        }
+        try {
+          Alpine.initTree(shell);
+        } catch (e) {
+          console.error("Sweet Portofolio: failed to re-init Alpine tree", e);
+        }
+      });
+    }, 0);
+  });
+
   // Fallback for browsers without Alpine.js and to handle double-click issue
   document.addEventListener("DOMContentLoaded", function () {
     // Get the modal elements
