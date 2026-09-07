@@ -12,7 +12,7 @@
  * Plugin Name:   Sweet Portofolio
  * Plugin URI:    Portofolio Website Simple untuk mitra websweetstudio.com
  * Description:   Plugin untuk web utama
- * Version:       1.1.7
+ * Version:       1.1.8
  * Author:        Aditya K
  * Author URI:    https://websweetstudio.com
  * Text Domain:   sweet-portofolio
@@ -26,7 +26,7 @@ if (! defined('ABSPATH')) exit;
 /**
  * Currently plugin version.
  */
-define('SWEETPORTOFOLIO_VERSION', '1.1.7');
+define('SWEETPORTOFOLIO_VERSION', '1.1.8');
 
 /**
  * Define plugin path url

@@ -217,7 +217,16 @@
     } else if (this.portofolioSelection.length > 0) {
       var selection = this.portofolioSelection;
       this.filteredPortfolios = portfolios.filter(function (p) {
-        return p && p.jenis && selection.indexOf(p.jenis) !== -1;
+        if (!p) return false;
+        if (Array.isArray(p.jenis)) {
+          for (var i = 0; i < p.jenis.length; i++) {
+            if (selection.indexOf(p.jenis[i]) !== -1) return true;
+          }
+        } else if (typeof p.jenis === "string") {
+          if (selection.indexOf(p.jenis) !== -1) return true;
+        }
+        if (p.jenis_web && selection.indexOf(p.jenis_web) !== -1) return true;
+        return false;
       });
     } else {
       this.filteredPortfolios = portfolios.slice();
