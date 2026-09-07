@@ -84,6 +84,7 @@
         portofolioCredit = "",
         portofolioSelection = [],
         selectedIds = [],
+        showDescription = true,
       ) => ({
         filterFormOpen: false,
         portfolios: [],
