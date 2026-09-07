@@ -26,7 +26,7 @@ class WscrmClient
 
     /**
      * Fetch demos from wscrm API. Returns data in format compatible
-     * with the existing portfolio template (Alpine.js).
+     * with the existing portfolio template (vanilla JS).
      *
      * Optional query params supported by the API:
      * - category: filter by category slug

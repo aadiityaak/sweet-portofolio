@@ -334,7 +334,7 @@ class Settings
 
                     <div class="sweet-portofolio-form-section">
                         <h3 class="sweet-portofolio-section-title">Portofolio Page</h3>
-                        <div x-data="portfolioPageGenerator()" class="portfolio-page-container">
+                        <div id="portfolio-page-generator" class="portfolio-page-container">
                             <div class="sweet-portofolio-form-row">
                                 <div class="sweet-portofolio-form-col">
                                     <label for="portofolio_page_select" class="sweet-portofolio-label">Select Page</label>
@@ -355,15 +355,13 @@ class Settings
                                 <div class="sweet-portofolio-form-col">
                                     <div class="sweet-portofolio-button-group">
                                         <button
-                                            @click="generatePortfolioPage(true)"
-                                            :disabled="generating"
+                                            id="btn-generate-portfolio-page"
                                             type="button"
-                                            class="sweet-portofolio-button sweet-portofolio-button-primary"
-                                            x-text="generating ? 'Generating...' : 'Generate Page'">
+                                            class="sweet-portofolio-button sweet-portofolio-button-primary">
+                                            Generate Page
                                         </button>
                                         <button
-                                            @click="viewPortfolioPage()"
-                                            :disabled="!hasPortfolioPage()"
+                                            id="btn-view-portfolio-page"
                                             type="button"
                                             class="sweet-portofolio-button sweet-portofolio-button-secondary">
                                             View Page
@@ -372,8 +370,8 @@ class Settings
                                 </div>
                             </div>
 
-                            <div x-show="message" x-transition class="sweet-portofolio-notice" :class="'sweet-portofolio-notice-' + messageType">
-                                <p x-text="message"></p>
+                            <div id="portfolio-page-message" class="sweet-portofolio-notice" style="display:none">
+                                <p></p>
                             </div>
 
                             <div class="sweet-portofolio-help-text">
@@ -385,7 +383,7 @@ class Settings
 
                     <div class="sweet-portofolio-form-section">
                         <h3 class="sweet-portofolio-section-title">Preview Page</h3>
-                        <div x-data="previewPageGenerator()" class="preview-page-container">
+                        <div id="preview-page-generator" class="preview-page-container">
                             <div class="sweet-portofolio-form-row">
                                 <div class="sweet-portofolio-form-col">
                                     <label for="portofolio_preview_page_select" class="sweet-portofolio-label">Select Page</label>
@@ -406,15 +404,13 @@ class Settings
                                 <div class="sweet-portofolio-form-col">
                                     <div class="sweet-portofolio-button-group">
                                         <button
-                                            @click="generatePreviewPage(true)"
-                                            :disabled="generating"
+                                            id="btn-generate-preview-page"
                                             type="button"
-                                            class="sweet-portofolio-button sweet-portofolio-button-primary"
-                                            x-text="generating ? 'Generating...' : 'Generate Preview Page'">
+                                            class="sweet-portofolio-button sweet-portofolio-button-primary">
+                                            Generate Preview Page
                                         </button>
                                         <button
-                                            @click="viewPreviewPage()"
-                                            :disabled="!hasPreviewPage()"
+                                            id="btn-view-preview-page"
                                             type="button"
                                             class="sweet-portofolio-button sweet-portofolio-button-secondary">
                                             View Page
@@ -423,8 +419,8 @@ class Settings
                                 </div>
                             </div>
 
-                            <div x-show="message" x-transition class="sweet-portofolio-notice" :class="'sweet-portofolio-notice-' + messageType">
-                                <p x-text="message"></p>
+                            <div id="preview-page-message" class="sweet-portofolio-notice" style="display:none">
+                                <p></p>
                             </div>
 
                             <div class="sweet-portofolio-help-text">
@@ -505,210 +501,123 @@ class Settings
         </div>
 
         <script>
-            // Make sure Alpine.js is loaded before initializing components
-            document.addEventListener('DOMContentLoaded', () => {
+        (function () {
+            'use strict';
 
-                // Check if Alpine.js is loaded
-                if (typeof Alpine === 'undefined') {
-                    console.error('Alpine.js is not loaded');
-                    return;
+            function showMessage(boxId, text, type) {
+                var box = document.getElementById(boxId);
+                if (!box) return;
+                var p = box.querySelector('p');
+                if (p) p.textContent = text;
+                box.classList.remove('sweet-portofolio-notice-success', 'sweet-portofolio-notice-error');
+                if (type) box.classList.add('sweet-portofolio-notice-' + type);
+                box.style.display = text ? '' : 'none';
+                if (text) {
+                    setTimeout(function () {
+                        box.style.display = 'none';
+                    }, 5000);
+                }
+            }
+
+            function upsertPageOption(selectId, pageId, pageTitle) {
+                var select = document.getElementById(selectId);
+                if (!select || !pageId) return;
+                var optionExists = false;
+                for (var i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value == pageId) {
+                        optionExists = true;
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+                if (!optionExists) {
+                    var newOption = document.createElement('option');
+                    newOption.value = pageId;
+                    newOption.text = pageTitle;
+                    newOption.selected = true;
+                    select.appendChild(newOption);
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+
+            async function generatePage(apiUrl, btn, messageBoxId, selectId, defaultTitle) {
+                btn.disabled = true;
+                var originalLabel = btn.textContent;
+                btn.textContent = 'Generating...';
+                showMessage(messageBoxId, '', '');
+
+                try {
+                    var response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-WP-Nonce': window.wpApiSettings.nonce
+                        },
+                        body: JSON.stringify({ force: true })
+                    });
+
+                    var data = await response.json();
+
+                    if (response.ok) {
+                        showMessage(messageBoxId, data.message || 'Page created successfully!', 'success');
+                        if (data.page_id) {
+                            upsertPageOption(selectId, data.page_id, data.page_title || defaultTitle);
+                        }
+                    } else if (data.code === 'page_exists') {
+                        showMessage(messageBoxId, data.message + ' Use the "Force Generate" button to overwrite the existing page.', 'error');
+                    } else {
+                        showMessage(messageBoxId, data.message || 'Error creating page.', 'error');
+                    }
+                } catch (error) {
+                    showMessage(messageBoxId, 'Network error: ' + error.message, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = originalLabel;
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                var portfolioBtn = document.getElementById('btn-generate-portfolio-page');
+                if (portfolioBtn) {
+                    portfolioBtn.addEventListener('click', function () {
+                        generatePage(
+                            '<?php echo rest_url('sweet-portofolio/v1/generate-portfolio-page'); ?>',
+                            portfolioBtn,
+                            'portfolio-page-message',
+                            'portofolio_page_select',
+                            'Portofolio'
+                        );
+                    });
                 }
 
-            });
-
-            document.addEventListener('alpine:init', () => {
-
-                // Function to generate portfolio page
-                Alpine.data('portfolioPageGenerator', () => ({
-                    generating: false,
-                    message: '',
-                    messageType: '',
-
-                    async generatePortfolioPage(force = true) {
-
-                        this.generating = true;
-                        this.message = '';
-
-                        try {
-                            const apiUrl = '<?php echo rest_url('sweet-portofolio/v1/generate-portfolio-page'); ?>';
-
-                            const response = await fetch(apiUrl, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-WP-Nonce': wpApiSettings.nonce
-                                },
-                                body: JSON.stringify({
-                                    force: force
-                                })
-                            });
-
-                            const data = await response.json();
-
-                            if (response.ok) {
-                                this.message = data.message || 'Portfolio page created successfully!';
-                                this.messageType = 'success';
-
-                                // Update the select dropdown
-                                if (data.page_id) {
-                                    const select = document.getElementById('portofolio_page_select');
-                                    if (select) {
-                                        // Add new option if not exists
-                                        let optionExists = false;
-                                        for (let i = 0; i < select.options.length; i++) {
-                                            if (select.options[i].value == data.page_id) {
-                                                optionExists = true;
-                                                select.selectedIndex = i;
-                                                break;
-                                            }
-                                        }
-
-                                        if (!optionExists) {
-                                            const newOption = document.createElement('option');
-                                            newOption.value = data.page_id;
-                                            newOption.text = data.page_title || 'Portofolio';
-                                            newOption.selected = true;
-                                            select.appendChild(newOption);
-
-                                            // Trigger change event to notify WordPress
-                                            const changeEvent = new Event('change', {
-                                                bubbles: true
-                                            });
-                                            select.dispatchEvent(changeEvent);
-                                        }
-                                    } else {
-                                        console.error('Select element not found');
-                                    }
-                                }
-                            } else {
-                                if (data.code === 'page_exists') {
-                                    this.message = data.message + ' Use the "Force Generate" button to overwrite the existing page.';
-                                } else {
-                                    this.message = data.message || 'Error creating portfolio page.';
-                                }
-                                this.messageType = 'error';
-                                console.error('Error message:', this.message);
-                            }
-                        } catch (error) {
-                            console.error('Network error:', error);
-                            this.message = 'Network error: ' + error.message;
-                            this.messageType = 'error';
-                        } finally {
-                            this.generating = false;
-
-                            // Clear message after 5 seconds
-                            setTimeout(() => {
-                                this.message = '';
-                            }, 5000);
-                        }
-                    },
-
-                    viewPortfolioPage() {
-                        // Direct to the portfolio page on frontend
+                var portfolioViewBtn = document.getElementById('btn-view-portfolio-page');
+                if (portfolioViewBtn) {
+                    portfolioViewBtn.addEventListener('click', function () {
                         window.open('<?php echo home_url('/portofolio'); ?>', '_blank');
-                    },
+                    });
+                }
 
-                    hasPortfolioPage() {
-                        const select = document.getElementById('portofolio_page_select');
-                        return select && select.value && select.value !== '-1';
-                    }
-                }));
+                var previewBtn = document.getElementById('btn-generate-preview-page');
+                if (previewBtn) {
+                    previewBtn.addEventListener('click', function () {
+                        generatePage(
+                            '<?php echo rest_url('sweet-portofolio/v1/generate-preview-page'); ?>',
+                            previewBtn,
+                            'preview-page-message',
+                            'portofolio_preview_page_select',
+                            'Preview Portofolio'
+                        );
+                    });
+                }
 
-                // Function to generate preview page
-                Alpine.data('previewPageGenerator', () => ({
-                    generating: false,
-                    message: '',
-                    messageType: '',
-
-                    async generatePreviewPage(force = true) {
-
-                        this.generating = true;
-                        this.message = '';
-
-                        try {
-                            const apiUrl = '<?php echo rest_url('sweet-portofolio/v1/generate-preview-page'); ?>';
-
-                            const response = await fetch(apiUrl, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-WP-Nonce': wpApiSettings.nonce
-                                },
-                                body: JSON.stringify({
-                                    force: force
-                                })
-                            });
-
-                            const data = await response.json();
-
-                            if (response.ok) {
-                                this.message = data.message || 'Preview page created successfully!';
-                                this.messageType = 'success';
-
-                                // Update the select dropdown
-                                if (data.page_id) {
-                                    const select = document.getElementById('portofolio_preview_page_select');
-                                    if (select) {
-                                        // Add new option if not exists
-                                        let optionExists = false;
-                                        for (let i = 0; i < select.options.length; i++) {
-                                            if (select.options[i].value == data.page_id) {
-                                                optionExists = true;
-                                                select.selectedIndex = i;
-                                                break;
-                                            }
-                                        }
-
-                                        if (!optionExists) {
-                                            const newOption = document.createElement('option');
-                                            newOption.value = data.page_id;
-                                            newOption.text = data.page_title || 'Preview Portofolio';
-                                            newOption.selected = true;
-                                            select.appendChild(newOption);
-
-                                            // Trigger change event to notify WordPress
-                                            const changeEvent = new Event('change', {
-                                                bubbles: true
-                                            });
-                                            select.dispatchEvent(changeEvent);
-                                        }
-                                    } else {
-                                        console.error('Preview select element not found');
-                                    }
-                                }
-                            } else {
-                                if (data.code === 'page_exists') {
-                                    this.message = data.message + ' Use the "Force Generate" button to overwrite the existing page.';
-                                } else {
-                                    this.message = data.message || 'Error creating preview page.';
-                                }
-                                this.messageType = 'error';
-                            }
-                        } catch (error) {
-                            console.error('Network error:', error);
-                            this.message = 'Network error: ' + error.message;
-                            this.messageType = 'error';
-                        } finally {
-                            this.generating = false;
-
-                            // Clear message after 5 seconds
-                            setTimeout(() => {
-                                this.message = '';
-                            }, 5000);
-                        }
-                    },
-
-                    viewPreviewPage() {
-                        // Direct to the preview page on frontend
+                var previewViewBtn = document.getElementById('btn-view-preview-page');
+                if (previewViewBtn) {
+                    previewViewBtn.addEventListener('click', function () {
                         window.open('<?php echo home_url('/preview-portofolio'); ?>', '_blank');
-                    },
-
-                    hasPreviewPage() {
-                        const select = document.getElementById('portofolio_preview_page_select');
-                        return select && select.value && select.value !== '-1';
-                    }
-                }));
+                    });
+                }
             });
+        })();
         </script>
 <?php
     }

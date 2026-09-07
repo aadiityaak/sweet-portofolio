@@ -148,53 +148,40 @@ if (isset($shortcode_category) && !empty($shortcode_category)) {
                 </div>
             <?php endif; ?>
 
-            <!-- Add data for Alpine.js -->
+            <!-- Portfolio data consumed by vanilla JS (assets/js/script.js) -->
             <script type="text/plain" id="portfolios-data"><?php echo is_array($data) ? json_encode(array_values($data), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) : '[]'; ?></script>
 
-            <!-- Alpine.js portfolio component -->
-            <div class="portfolio-shell" x-data="portfolioGrid(
-                    <?php echo $current_page; ?>,
-                    '<?php echo $jenis_web; ?>',
-                    '<?php echo isset($shortcode_title) ? $shortcode_title : 'yes'; ?>',
-                    '<?php echo $style_thumbnail; ?>',
-                    '<?php echo !empty($preview_page) ? get_the_permalink($preview_page) : ''; ?>',
-                    '<?php echo $whatsapp_number; ?>',
-                    '<?php echo $portofolio_credit; ?>',
-                    <?php
-                    // Ensure portofolio_selection is a valid array
-                    if (!is_array($portofolio_selection)) {
-                        $portofolio_selection = array();
-                    }
-                    // Output the array as a JavaScript array literal
-                    echo '[' . implode(',', array_map(function ($item) {
-                        return "'" . esc_js($item) . "'";
-                    }, $portofolio_selection)) . ']';
-                    ?>
-                ,
-                <?php
-                echo '[' . implode(',', array_map('intval', $shortcode_ids)) . ']';
-                ?>
-                ,
-                <?php
-                // Show card description (excerpt) unless disabled via shortcode attribute
-                $description_attr = (isset($atts) && is_array($atts) && isset($atts['description'])) ? $atts['description'] : 'yes';
-                echo ($description_attr === 'no') ? 'false' : 'true';
-                ?>
-                )">
-                <!-- Filter Form with Alpine.js -->
+            <?php
+            $description_attr = (isset($atts) && is_array($atts) && isset($atts['description'])) ? $atts['description'] : 'yes';
+            $grid_config = array(
+                'initialPage' => max(1, (int) $current_page),
+                'initialCategory' => $jenis_web,
+                'showTitle' => isset($shortcode_title) ? $shortcode_title : 'yes',
+                'styleThumbnail' => $style_thumbnail,
+                'previewPage' => !empty($preview_page) ? get_the_permalink($preview_page) : '',
+                'whatsappNumber' => $whatsapp_number,
+                'portofolioCredit' => $portofolio_credit,
+                'portofolioSelection' => is_array($portofolio_selection) ? array_values($portofolio_selection) : array(),
+                'selectedIds' => array_values(array_map('intval', $shortcode_ids)),
+                'showDescription' => ($description_attr !== 'no'),
+            );
+            ?>
+            <!-- Portfolio grid (rendered by vanilla JS) -->
+            <div class="portfolio-shell" data-config="<?php echo htmlspecialchars(json_encode($grid_config), ENT_QUOTES, 'UTF-8'); ?>">
+                <!-- Filter Form -->
                 <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes';
                 if ($filter_attr !== 'no') : ?>
                     <div class="filter-section">
                         <div class="filter-row">
                             <div class="filter-group">
                                 <label for="category-filter" class="portfolio-filter-label">Filter kategori</label>
-                                <select id="category-filter" x-model="selectedCategory" @change="filterPortfolios()" class="filter-select">
+                                <select id="category-filter" class="filter-select" data-current="<?php echo esc_attr($jenis_web); ?>">
                                     <option value="">All Categories</option>
                                     <?php
                                     if (is_array($categories_data) && !empty($portofolio_selection)) {
                                         foreach ($categories_data as $category) {
                                             if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
-                                                echo '<option value="' . esc_attr($category['slug']) . '">' . esc_html($category['category']) . '</option>';
+                                                echo '<option value="' . esc_attr($category['slug']) . '"' . selected($jenis_web, $category['slug'], false) . '>' . esc_html($category['category']) . '</option>';
                                             }
                                         }
                                     }
@@ -207,103 +194,45 @@ if (isset($shortcode_category) && !empty($shortcode_category)) {
 
                 <div class="portfolio-results-bar">
                     <div>
-                        <span class="portfolio-results-kicker" x-text="selectedCategory || 'Semua kategori'"></span>
+                        <span class="portfolio-results-kicker"></span>
                         <h2 class="portfolio-results-title">Koleksi portofolio</h2>
                     </div>
-                    <div class="portfolio-results-summary" x-text="`${filteredPortfolios.length} item tersedia`"></div>
+                    <div class="portfolio-results-summary"></div>
                 </div>
 
-                <div class="portfolio-empty-state" x-show="filteredPortfolios.length === 0" x-cloak>
+                <div class="portfolio-empty-state" style="display:none">
                     <span class="portfolio-badge portfolio-badge-muted">Belum ada hasil</span>
                     <h3 class="portfolio-empty-title">Portofolio yang Anda cari belum tersedia.</h3>
                     <p class="portfolio-empty-text">Coba pilih kategori lain atau hubungi kami untuk meminta contoh desain yang paling sesuai dengan kebutuhan bisnis Anda.</p>
                 </div>
 
-                <div class="frame-portofolio" id="portfolio-grid" x-show="filteredPortfolios.length > 0" x-cloak>
-                    <template x-for="(item, index) in paginatedPortfolios" :key="'portfolio-' + (item.id || index)">
-                        <div class="col-portofolio">
-                            <div class="card-portofolio">
-                                <div class="card-image">
-                                    <img :src="getImageUrl(item)" :alt="item.title" @error="$event.target.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBBdmFpbGFibGU8L3RleHQ+PC9zdmc+'">
-                                    <span x-show="portofolioCredit" class="card-credit" x-text="portofolioCredit"></span>
-                                    <div class="card-actions">
-                                        <a :href="getPreviewUrl(item)" class="btn-preview" target="_blank">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
-                                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7" />
-                                            </svg>
-                                            Preview
-                                        </a>
-                                        <a x-show="whatsappNumber" :href="getWhatsAppUrl(item)" class="btn-whatsapp" target="_blank">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                                <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
-                                            </svg> Order
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="card-content">
-                                    <div class="card-meta-row">
-                                        <span class="card-meta-pill">Website Portfolio</span>
-                                        <span x-show="portofolioCredit" class="card-meta-text" x-text="portofolioCredit"></span>
-                                    </div>
-                                    <h3 x-show="showTitle !== 'no'" class="card-title">
-                                        <a :href="getPreviewUrl(item)" x-text="item.title" class="card-title-link"></a>
-                                    </h3>
-                                    <p x-show="item.excerpt && showDescription" class="card-excerpt" x-html="item.excerpt"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
+                <div class="frame-portofolio" id="portfolio-grid" style="display:none"></div>
 
-                <!-- Pagination with Alpine.js -->
-                <div x-show="totalPages > 1" class="pagination" x-cloak>
+                <!-- Pagination -->
+                <div class="pagination" style="display:none">
                     <span
-                        @click="if (currentPage > 1) goToPage(currentPage - 1)"
-                        @keydown.enter.prevent="if (currentPage > 1) goToPage(currentPage - 1)"
-                        @keydown.space.prevent="if (currentPage > 1) goToPage(currentPage - 1)"
+                        data-pagination="prev"
                         class="pagination-btn"
-                        :class="{'disabled': currentPage === 1}"
-                        :tabindex="currentPage === 1 ? -1 : 0"
                         role="button"
+                        tabindex="0"
                         aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </span>
 
-                    <div class="pagination-pages">
-                        <template x-for="page in visiblePages" :key="'page-' + page">
-                            <template x-if="isEllipsis(page)">
-                                <span class="pagination-btn disabled" aria-disabled="true" x-text="page"></span>
-                            </template>
-                            <template x-if="!isEllipsis(page)">
-                                <span
-                                    class="pagination-btn"
-                                    :class="{'active': page === currentPage}"
-                                    role="button"
-                                    tabindex="0"
-                                    @click="goToPage(page)"
-                                    @keydown.enter.prevent="goToPage(page)"
-                                    @keydown.space.prevent="goToPage(page)"
-                                    x-text="page"></span>
-                            </template>
-                        </template>
-                    </div>
+                    <div class="pagination-pages"></div>
 
                     <span
-                        @click="if (currentPage < totalPages) goToPage(currentPage + 1)"
-                        @keydown.enter.prevent="if (currentPage < totalPages) goToPage(currentPage + 1)"
-                        @keydown.space.prevent="if (currentPage < totalPages) goToPage(currentPage + 1)"
+                        data-pagination="next"
                         class="pagination-btn"
-                        :class="{'disabled': currentPage === totalPages}"
-                        :tabindex="currentPage === totalPages ? -1 : 0"
                         role="button"
+                        tabindex="0"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </span>
                 </div>
 
-                <div class="pagination-info" x-show="totalPages > 1" x-cloak>
-                    <span x-text="`${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, filteredPortfolios.length)} dari ${filteredPortfolios.length} items`"></span>
+                <div class="pagination-info" style="display:none">
+                    <span></span>
                 </div>
             </div>
         </div>

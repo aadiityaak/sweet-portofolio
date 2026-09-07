@@ -10,34 +10,6 @@ namespace SweetPortofolio\Frontend;
 class Shortcode
 {
     /**
-     * Check whether Alpine.js is already present via a known script handle.
-     *
-     * @return bool
-     */
-    private function has_alpine_script()
-    {
-        $handles = array(
-            'sweet-alpine-js-frontend',
-            'sweet-alpine-js-admin',
-            'alpinejs',
-            'alpine-js',
-        );
-
-        foreach ($handles as $handle) {
-            if (
-                wp_script_is($handle, 'registered') ||
-                wp_script_is($handle, 'enqueued') ||
-                wp_script_is($handle, 'done')
-            ) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
      * Initialize the class.
      */
     public function __construct()
@@ -129,10 +101,6 @@ class Shortcode
         $script_version = file_exists($script_path) ? (string) filemtime($script_path) : SWEETPORTOFOLIO_VERSION;
 
         wp_enqueue_script('sweet-portofolio-script', SWEETPORTOFOLIO_URL . 'assets/js/script.js', array('jquery'), $script_version, true);
-        // Load Alpine.js only when it has not already been loaded by the theme or another plugin.
-        if (!$this->has_alpine_script()) {
-            wp_enqueue_script('sweet-alpine-js-frontend', 'https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js', array(), '3.13.3', true);
-        }
 
         // Include template
         $template_path = SWEETPORTOFOLIO_PATH . 'templates/page-portfolio-list.php';
@@ -144,7 +112,7 @@ class Shortcode
 
         $output = ob_get_clean();
 
-        // Minify output to prevent wpautop from breaking Alpine.js attributes
+        // Minify output to prevent wpautop from altering the vanilla JS markup
         // We replace newlines with spaces to maintain attribute separation
         return str_replace(array("\r\n", "\r", "\n"), ' ', $output);
     }

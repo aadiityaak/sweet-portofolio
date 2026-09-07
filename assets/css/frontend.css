@@ -766,11 +766,6 @@
   display: none !important;
 }
 
-/* Alpine.js x-cloak styling */
-[x-cloak] {
-  display: none !important;
-}
-
 /* Force show modal class for fallback */
 .modal-force-show {
   display: block !important;
