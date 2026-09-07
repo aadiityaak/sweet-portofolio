@@ -110,19 +110,36 @@
     this.resultsKicker = root.querySelector(".portfolio-results-kicker");
     this.resultsSummary = root.querySelector(".portfolio-results-summary");
 
-    // Category select filter
+    // Category filter: tabs (DESIGN.md category-tab) + hidden select fallback
     var categoryFilter = root.querySelector("#category-filter");
+    this.categoryFilter = categoryFilter || null;
+    if (this.categoryFilter) {
+      this.categoryFilter.value = this.selectedCategory;
+    }
+    this.tabs = root.querySelectorAll(".portfolio-tab");
+    var self = this;
+
+    function selectCategory(value) {
+      self.selectedCategory = value || "";
+      self.currentPage = 1;
+      self.updateURL();
+      self.syncTabs();
+      self.filter();
+      self.render();
+    }
+
     if (categoryFilter) {
-      categoryFilter.value = this.selectedCategory;
-      var self = this;
       categoryFilter.addEventListener("change", function () {
-        self.selectedCategory = this.value;
-        self.currentPage = 1;
-        self.updateURL();
-        self.filter();
-        self.render();
+        selectCategory(this.value);
       });
-      this.categoryFilter = categoryFilter;
+    }
+
+    if (this.tabs && this.tabs.length) {
+      Array.prototype.forEach.call(this.tabs, function (btn) {
+        btn.addEventListener("click", function () {
+          selectCategory(btn.getAttribute("data-category") || "");
+        });
+      });
     }
 
     var rawData = parseJSONScript("portfolios-data");
@@ -145,28 +162,44 @@
     // URL overrides
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("jenis_web")) {
-      this.selectedCategory = urlParams.get("jenis_web");
-      if (this.categoryFilter)
-        this.categoryFilter.value = this.selectedCategory;
+      this.selectedCategory = urlParams.get("jenis_web") || "";
     }
     if (urlParams.has("halaman")) {
       this.currentPage = parseInt(urlParams.get("halaman"), 10) || 1;
     }
+    if (this.categoryFilter) this.categoryFilter.value = this.selectedCategory;
 
     var self2 = this;
     window.addEventListener("popstate", function () {
       self2.updateFromURL();
     });
 
+    this.syncTabs();
     this.filter();
     this.render();
   }
+
+  PortfolioGrid.prototype.syncTabs = function () {
+    if (this.categoryFilter) this.categoryFilter.value = this.selectedCategory;
+    if (!this.tabs || !this.tabs.length) return;
+    var current = this.selectedCategory || "";
+    Array.prototype.forEach.call(this.tabs, function (btn) {
+      var active = (btn.getAttribute("data-category") || "") === current;
+      if (active) {
+        btn.classList.add("is-active");
+        btn.setAttribute("aria-selected", "true");
+      } else {
+        btn.classList.remove("is-active");
+        btn.setAttribute("aria-selected", "false");
+      }
+    });
+  };
 
   PortfolioGrid.prototype.updateFromURL = function () {
     var urlParams = new URLSearchParams(window.location.search);
     this.selectedCategory = urlParams.get("jenis_web") || "";
     this.currentPage = parseInt(urlParams.get("halaman"), 10) || 1;
-    if (this.categoryFilter) this.categoryFilter.value = this.selectedCategory;
+    this.syncTabs();
     this.filter();
     this.render();
   };
@@ -320,6 +353,9 @@
     var showDescription = this.showDescription;
     var previewUrl = esc(this.getPreviewUrl(item));
     var waUrl = esc(this.getWhatsAppUrl(item));
+    var categoryLabel = esc(
+      (item && (item.category_name || item.jenis_web)) || "Website Portfolio",
+    );
 
     var html = '<div class="col-portofolio"><div class="card-portofolio">';
     html += '<div class="card-image">';
@@ -353,7 +389,7 @@
     html += "</div></div>"; // card-actions, card-image
 
     html += '<div class="card-content"><div class="card-meta-row">';
-    html += '<span class="card-meta-pill">Website Portfolio</span>';
+    html += '<span class="card-meta-pill">' + categoryLabel + "</span>";
     if (credit) {
       html += '<span class="card-meta-text">' + esc(credit) + "</span>";
     }
@@ -361,9 +397,13 @@
 
     if (showTitle) {
       html +=
-        '<h3 class="card-title"><a href="' +
+        '<h3 class="card-title" title="' +
+        esc(item.title) +
+        '"><a href="' +
         previewUrl +
-        '" class="card-title-link">' +
+        '" class="card-title-link" title="' +
+        esc(item.title) +
+        '">' +
         esc(item.title) +
         "</a></h3>";
     }

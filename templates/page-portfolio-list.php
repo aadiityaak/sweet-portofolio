@@ -168,27 +168,38 @@ if (isset($shortcode_category) && !empty($shortcode_category)) {
             ?>
             <!-- Portfolio grid (rendered by vanilla JS) -->
             <div class="portfolio-shell" data-config="<?php echo htmlspecialchars(json_encode($grid_config), ENT_QUOTES, 'UTF-8'); ?>">
-                <!-- Filter Form -->
+                <!-- Filter Tabs (DESIGN.md category-tab) -->
                 <?php $filter_attr = (isset($atts) && is_array($atts) && isset($atts['filter'])) ? $atts['filter'] : 'yes';
-                if ($filter_attr !== 'no') : ?>
+                if ($filter_attr !== 'no') :
+                    $visible_categories = array();
+                    if (is_array($categories_data)) {
+                        foreach ($categories_data as $category) {
+                            if (!isset($category['slug'])) {
+                                continue;
+                            }
+                            if (!empty($portofolio_selection) && !in_array($category['slug'], $portofolio_selection)) {
+                                continue;
+                            }
+                            $visible_categories[] = $category;
+                        }
+                    }
+                ?>
                     <div class="filter-section">
-                        <div class="filter-row">
-                            <div class="filter-group">
-                                <label for="category-filter" class="portfolio-filter-label">Filter kategori</label>
-                                <select id="category-filter" class="filter-select" data-current="<?php echo esc_attr($jenis_web); ?>">
-                                    <option value="">All Categories</option>
-                                    <?php
-                                    if (is_array($categories_data) && !empty($portofolio_selection)) {
-                                        foreach ($categories_data as $category) {
-                                            if (isset($category['slug']) && in_array($category['slug'], $portofolio_selection)) {
-                                                echo '<option value="' . esc_attr($category['slug']) . '"' . selected($jenis_web, $category['slug'], false) . '>' . esc_html($category['category']) . '</option>';
-                                            }
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
+                        <div class="portfolio-tabs" role="tablist" aria-label="Filter kategori">
+                            <button type="button" class="portfolio-tab<?php echo empty($jenis_web) ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo empty($jenis_web) ? 'true' : 'false'; ?>" data-category="">Semua</button>
+                            <?php foreach ($visible_categories as $category) : ?>
+                                <button type="button" class="portfolio-tab<?php echo ($jenis_web === $category['slug']) ? ' is-active' : ''; ?>" role="tab" aria-selected="<?php echo ($jenis_web === $category['slug']) ? 'true' : 'false'; ?>" data-category="<?php echo esc_attr($category['slug']); ?>"><?php echo esc_html($category['category']); ?></button>
+                            <?php endforeach; ?>
                         </div>
+                        <label for="category-filter" class="portfolio-filter-label" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Filter kategori</label>
+                        <select id="category-filter" class="filter-select" data-current="<?php echo esc_attr($jenis_web); ?>" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0;pointer-events:none;" tabindex="-1" aria-hidden="true">
+                            <option value="">All Categories</option>
+                            <?php
+                            foreach ($visible_categories as $category) {
+                                echo '<option value="' . esc_attr($category['slug']) . '"' . selected($jenis_web, $category['slug'], false) . '>' . esc_html($category['category']) . '</option>';
+                            }
+                            ?>
+                        </select>
                     </div>
                 <?php endif; ?>
 
